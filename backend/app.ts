@@ -18,9 +18,11 @@ import userRoutes from './routes/user.route';
 import adminRoutes from './routes/admin.route';
 
 dotenv.config();
-connectDB(process.env.MONGO_URI || 'mongodb://localhost:27017/Cinepax');
+connectDB(process.env.MONGO_URI as string);
 
 const app = express();
+
+app.use(cors());
 
 // Middleware
 app.use(express.json());
@@ -29,6 +31,8 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   console.log(`Incoming ${req.method} request to ${req.url}`);
   next();
 });
+
+
 
 // app.use((req: Request, res: Response, next: NextFunction) => {
 //   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -47,27 +51,20 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 
 
-app.use(cors({
-  origin: 'http://localhost:3000', 
-  credentials: true,
-}));
-
-
-
 // Routes
-app.use('/', authRoutes);
-app.use('/customer', customerRoutes);
-app.use('/user', userRoutes);
-app.use('/movies', movieRoutes);
-app.use('/theaters', theaterRoutes);
-app.use('/staff', staffRoutes);
-app.use('/seats', seatRoutes);
-app.use('/showtimes', showtimeRoutes);
-app.use('/tickets', ticketRoutes);
-app.use('/payments', paymentRoutes);
-app.use('/admin', adminRoutes);
+app.use('/api', authRoutes);
+app.use('/api/customer', customerRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/movies', movieRoutes);
+app.use('/api/theaters', theaterRoutes);
+app.use('/api/staff', staffRoutes);
+app.use('/api/seats', seatRoutes);
+app.use('/api/showtimes', showtimeRoutes);
+app.use('/api/tickets', ticketRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/admin', adminRoutes);
 
-app.get('/', (req: Request, res: Response) => {
+app.get('/api', (req: Request, res: Response) => {
   res.send('Backend server is running!');
 });
 
