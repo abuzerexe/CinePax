@@ -37,6 +37,7 @@ const __dirname = path.resolve();
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   console.log(`Incoming ${req.method} request to ${req.url}`);
+  console.log('All env vars:', Object.keys(process.env));
   next();
 });
 
