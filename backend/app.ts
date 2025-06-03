@@ -30,8 +30,10 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors());
-
+app.use(cors({
+  origin: 'https://cors-test.codehappy.dev', // your allowed origin
+  credentials: true // enable if using cookies or auth headers
+}));
 const __dirname = path.resolve();
 
 
