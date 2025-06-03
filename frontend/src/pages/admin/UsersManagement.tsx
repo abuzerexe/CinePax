@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -29,7 +28,7 @@ const UsersManagement = () => {
   const { toast } = useToast()
   const [usersList, setUsers] = useState<User[]>([])
   const [filteredUsers, setFilteredUsers] = useState<User[]>([])
-  const [theatersList, setTheaters] = useState<{ _id: string; name: string }[]>([])
+  const [, setTheaters] = useState<{ _id: string; name: string }[]>([])
   const [loading, setLoading] = useState(true)
   const [openDialog, setOpenDialog] = useState(false)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
@@ -119,7 +118,22 @@ const UsersManagement = () => {
           description: "User updated successfully",
         })
       } else {
-        const response = await users.create(formData)
+        if (!formData.fullName || !formData.email || !formData.password || !formData.role) {
+          toast({
+            title: "Error",
+            description: "Please fill in all required fields",
+            variant: "destructive",
+          });
+          return;
+        }
+        const response = await users.create(formData as {
+          fullName: string;
+          email: string;
+          password: string;
+          role: "admin" | "staff" | "customer";
+          theater?: string;
+          phone?: string;
+        })
         setUsers((prev) => [...prev, response.data])
         toast({
           title: "Success",
@@ -157,18 +171,18 @@ const UsersManagement = () => {
     }
   }
 
-  const getRoleColor = (role: string) => {
-    switch (role) {
-      case "admin":
-        return "bg-purple-100 text-purple-800"
-      case "staff":
-        return "bg-blue-100 text-blue-800"
-      case "customer":
-        return "bg-green-100 text-green-800"
-      default:
-        return "bg-gray-100 text-gray-800"
-    }
-  }
+  // const getRoleColor = (role: string) => {
+  //   switch (role) {
+  //     case "admin":
+  //       return "bg-purple-100 text-purple-800"
+  //     case "staff":
+  //       return "bg-blue-100 text-blue-800"
+  //     case "customer":
+  //       return "bg-green-100 text-green-800"
+  //     default:
+  //       return "bg-gray-100 text-gray-800"
+  //   }
+  // }
 
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage)
   const paginatedUsers = filteredUsers.slice(

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Play, Star } from "lucide-react"
+import { ArrowRight, Star } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import MovieCard from "../components/ui/movie-card"
 import { movies } from "../services/api"

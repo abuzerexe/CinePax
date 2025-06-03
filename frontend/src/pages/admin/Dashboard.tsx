@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Film, MapPin, Users, Ticket, TrendingUp, Clock, DollarSign } from "lucide-react"
+import { Film, MapPin, Users, Ticket, TrendingUp, DollarSign } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { movies, theaters, users, tickets } from "../../services/api"
 import { useAuth } from "../../contexts/AuthContext"

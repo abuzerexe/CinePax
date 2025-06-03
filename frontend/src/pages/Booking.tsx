@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator"
 import { MapPin, Calendar, Clock, CreditCard } from "lucide-react"
 import { useAuth } from "../contexts/AuthContext"
-import { movies, theaters, tickets, payments } from "../services/api"
+import { movies, theaters, tickets } from "../services/api"
 import useToast from "@/components/ui/use-toast"
 
 interface Showtime {
@@ -53,7 +53,7 @@ const Booking = () => {
   const [selectedSeats, setSelectedSeats] = useState<string[]>([])
   const [ticketCount, setTicketCount] = useState(1)
   const [paymentMethod, setPaymentMethod] = useState("card")
-  const [bookedSeats, setBookedSeats] = useState<string[]>([])
+  const [bookedSeats,] = useState<string[]>([])
 
   useEffect(() => {
     const fetchBookingData = async () => {

@@ -7,9 +7,9 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar, Clock, Star, Search, MapPin } from "lucide-react"
+import { Calendar, Clock, Star, MapPin } from "lucide-react"
 import { useAuth } from "../contexts/AuthContext"
-import { theaters, users } from "../services/api"
+import { theaters } from "../services/api"
 
 interface ShowtimeResponse {
   _id: string
@@ -48,14 +48,6 @@ interface Theater {
   capacity: number
 }
 
-interface ShowtimesResponse {
-  success: boolean
-  count: number
-  total: number
-  totalPages: number
-  currentPage: number
-  data: ShowtimeResponse[]
-}
 
 const TheaterShowtimes = () => {
   const { theaterId } = useParams()

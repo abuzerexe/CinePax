@@ -5,11 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Edit, Trash2, Plus, MapPin, Search } from "lucide-react"
+import { Edit, Trash2, Plus, Search } from "lucide-react"
 import { useAuth } from "@/contexts/AuthContext"
 import { theaters } from "../../services/api"
 import useToast from "@/components/ui/use-toast"
@@ -26,7 +24,7 @@ interface Theater {
 
 const TheatersManagement = () => {
   const { toast } = useToast()
-  const { isAdmin, isStaff, getAssignedTheater } = useAuth()
+  const { isAdmin} = useAuth()
   const [theatersList, setTheaters] = useState<Theater[]>([])
   const [filteredTheaters, setFilteredTheaters] = useState<Theater[]>([])
   const [loading, setLoading] = useState(true)
@@ -146,23 +144,23 @@ const TheatersManagement = () => {
     }
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        return "bg-green-100 text-green-800"
-      case "maintenance":
-        return "bg-yellow-100 text-yellow-800"
-      case "closed":
-        return "bg-red-100 text-red-800"
-      default:
-        return "bg-gray-100 text-gray-800"
-    }
-  }
+  // const getStatusColor = (status: string) => {
+  //   switch (status) {
+  //     case "active":
+  //       return "bg-green-100 text-green-800"
+  //     case "maintenance":
+  //       return "bg-yellow-100 text-yellow-800"
+  //     case "closed":
+  //       return "bg-red-100 text-red-800"
+  //     default:
+  //       return "bg-gray-100 text-gray-800"
+  //   }
+  // }
 
   // Filter theaters for staff members
-  const filteredTheatersForStaff = isStaff()
-    ? theatersList.filter((theater) => theater._id === getAssignedTheater()?.toString())
-    : theatersList
+  // const filteredTheatersForStaff = isStaff()
+  //   ? theatersList.filter((theater) => theater._id === getAssignedTheater()?.toString())
+  //   : theatersList
 
   const totalPages = Math.ceil(filteredTheaters.length / itemsPerPage)
   const paginatedTheaters = filteredTheaters.slice(

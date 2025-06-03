@@ -20,7 +20,7 @@ interface AuthContextType {
   updateUser: (user: User) => void
   isAdmin: () => boolean
   isStaff: () => boolean
-  getAssignedTheater: () => number | undefined
+  getAssignedTheater: () => string | undefined
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)

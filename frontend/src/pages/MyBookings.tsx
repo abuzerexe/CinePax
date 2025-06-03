@@ -98,9 +98,9 @@ const MyBookings = () => {
     }
   }
 
-  const handleDownloadTicket = (bookingId: string) => {
-    // TODO: Implement ticket download functionality
-  }
+  // const handleDownloadTicket = (bookingId: string) => {
+  //   // TODO: Implement ticket download functionality
+  // }
 
   if (!user) {
     return (
@@ -221,7 +221,7 @@ const MyBookings = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleDownloadTicket(booking.ticketId)}
+                        // onClick={() => handleDownloadTicket(booking.ticketId)}
                       >
                         <Download className="w-4 h-4 mr-2" />
                         Download Ticket
