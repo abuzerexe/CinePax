@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "nodemon --watch './**/*.ts' --exec ts-node dev.ts",
-    "build": "tsc",
+    "build": "npm install --include=dev && tsc",
     "vercel-build": "tsc",
     "watch": "tsc -w",
     "seed:movies": "ts-node scripts/seedMovies.ts",
