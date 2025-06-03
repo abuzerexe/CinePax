@@ -22,7 +22,6 @@ import adminRoutes from './routes/admin.route';
 dotenv.config();
 connectDB(process.env.MONGO_URI as string);
 
-
 const app = express();
 
 // Middleware
@@ -33,24 +32,10 @@ app.use(cors({
   credentials: true // enable if using cookies or auth headers
 }));
 
-
 app.use((req: Request, res: Response, next: NextFunction) => {
   console.log(`Incoming ${req.method} request to ${req.url}`);
   next();
 });
-
-// Routes
-app.use('/', authRoutes);
-app.use('/customer', customerRoutes);
-app.use('/user', userRoutes);
-app.use('/movies', movieRoutes);
-app.use('/theaters', theaterRoutes);
-app.use('/staff', staffRoutes);
-app.use('/seats', seatRoutes);
-app.use('/showtimes', showtimeRoutes);
-app.use('/tickets', ticketRoutes);
-app.use('/payments', paymentRoutes);
-app.use('/admin', adminRoutes);
 
 if (process.env.NODE_ENV === 'development') {
   // Dev mode root route message
@@ -69,10 +54,25 @@ if (process.env.NODE_ENV === 'development') {
   // Serve static files from the frontend build directory
   app.use(express.static(frontendPath));
   console.log('Static files being served from:', frontendPath);
+}
 
-  // Handle all other routes by serving the frontend
+// API Routes - these should take precedence over the catch-all route
+app.use('/api/auth', authRoutes);
+app.use('/api/customer', customerRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/movies', movieRoutes);
+app.use('/api/theaters', theaterRoutes);
+app.use('/api/staff', staffRoutes);
+app.use('/api/seats', seatRoutes);
+app.use('/api/showtimes', showtimeRoutes);
+app.use('/api/tickets', ticketRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/admin', adminRoutes);
+
+// Catch-all route for frontend - this should be last
+if (process.env.NODE_ENV !== 'development') {
   app.get('*', (req: Request, res: Response) => {
-    const indexPath = path.join(frontendPath, 'index.html');
+    const indexPath = path.join(__dirname, '../../frontend/dist', 'index.html');
     console.log('Serving index.html from:', indexPath);
     res.sendFile(indexPath);
   });
