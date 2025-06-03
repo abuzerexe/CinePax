@@ -13,7 +13,9 @@
     "baseUrl": ".",
     "paths": {
       "*": ["node_modules/*"]
-    }
+    },
+    "allowJs": true,
+    "declaration": true
   },
   "include": ["./**/*"],
   "exclude": ["node_modules", "dist"]

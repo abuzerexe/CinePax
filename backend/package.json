@@ -2,7 +2,7 @@
   "name": "cinemax",
   "version": "1.0.0",
   "type": "commonjs",
-  "main": "dist/index.js",
+  "main": "dist/dev.js",
   "scripts": {
     "start": "node dist/dev.js",
     "dev": "nodemon --watch './**/*.ts' --exec ts-node dev.ts",

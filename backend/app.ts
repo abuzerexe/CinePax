@@ -57,9 +57,8 @@ if (process.env.NODE_ENV === 'development') {
   app.get('/', (req: Request, res: Response) => {
     res.send('Backend server is running!');
   });
-  
 } else {
-  const frontendPath = path.join(__dirname, '../frontend/dist');
+  const frontendPath = path.join(__dirname, '../../frontend/dist');
   console.log('Production mode - Frontend path:', frontendPath);
   
   // Check if the frontend build exists
@@ -77,7 +76,6 @@ if (process.env.NODE_ENV === 'development') {
     console.log('Serving index.html from:', indexPath);
     res.sendFile(indexPath);
   });
-
 }
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
