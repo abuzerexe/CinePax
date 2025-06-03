@@ -1,6 +1,8 @@
 import express, { Request, Response, NextFunction } from 'express';
-import cors from 'cors';
+import cors from "cors";
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
+import path from 'path';
 
 import connectDB from './connect';
 
@@ -22,10 +24,13 @@ connectDB(process.env.MONGO_URI as string);
 
 const app = express();
 
-app.use(cors());
-
 // Middleware
 app.use(express.json());
+app.use(cookieParser());
+app.use(cors());
+
+const __dirname = path.resolve();
+
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   console.log(`Incoming ${req.method} request to ${req.url}`);
@@ -49,8 +54,18 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Backend server is running!');
 });
 
+
+if(process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+}
+
+app.get('*', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
+});
+
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!' });
 });
+
 export default app;
