@@ -22,8 +22,6 @@ import adminRoutes from './routes/admin.route';
 dotenv.config();
 connectDB(process.env.MONGO_URI as string);
 
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('All env vars:', Object.keys(process.env));
 
 const app = express();
 
@@ -35,9 +33,9 @@ app.use(cors({
   credentials: true // enable if using cookies or auth headers
 }));
 
+
 app.use((req: Request, res: Response, next: NextFunction) => {
   console.log(`Incoming ${req.method} request to ${req.url}`);
-  console.log('All env vars:', Object.keys(process.env));
   next();
 });
 
@@ -54,8 +52,13 @@ app.use('/tickets', ticketRoutes);
 app.use('/payments', paymentRoutes);
 app.use('/admin', adminRoutes);
 
-
-
+if (process.env.NODE_ENV === 'development') {
+  // Dev mode root route message
+  app.get('/', (req: Request, res: Response) => {
+    res.send('Backend server is running!');
+  });
+  
+} else {
   const frontendPath = path.join(__dirname, '../frontend/dist');
   console.log('Production mode - Frontend path:', frontendPath);
   
@@ -75,7 +78,7 @@ app.use('/admin', adminRoutes);
     res.sendFile(indexPath);
   });
 
-
+}
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
