@@ -42,6 +42,6 @@
     "typescript": "^5.8.3"
   },
   "seed:init": "ts-node ./src/seeds/init.ts",
-  "author_email": "abouzer@gmail.com",
+  "author_email": "abouzer381@gmail.com",
   "author_github": "https://github.com/abuzerexe"
 }
