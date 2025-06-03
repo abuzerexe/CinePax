@@ -50,11 +50,6 @@ app.use('/tickets', ticketRoutes);
 app.use('/payments', paymentRoutes);
 app.use('/admin', adminRoutes);
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Backend server is running!');
-});
-
-
 if (process.env.NODE_ENV === 'production') {
   const frontendPath = path.join(__dirname, '../frontend/dist');
   app.use(express.static(frontendPath));
