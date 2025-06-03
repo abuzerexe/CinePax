@@ -50,18 +50,32 @@ app.use('/tickets', ticketRoutes);
 app.use('/payments', paymentRoutes);
 app.use('/admin', adminRoutes);
 
-if (process.env.NODE_ENV === 'production') {
-  const frontendPath = path.join(__dirname, '../frontend/dist');
-  app.use(express.static(frontendPath));
-
-  app.get('*', (req: Request, res: Response) => {
-    res.sendFile(path.join(frontendPath, 'index.html'));
-  });
-} else {
+if (process.env.NODE_ENV === 'development') {
   // Dev mode root route message
   app.get('/', (req: Request, res: Response) => {
     res.send('Backend server is running!');
   });
+  
+} else {
+  const frontendPath = path.join(__dirname, '../frontend/dist');
+  console.log('Production mode - Frontend path:', frontendPath);
+  
+  // Check if the frontend build exists
+  if (!require('fs').existsSync(frontendPath)) {
+    console.error('Frontend build not found at:', frontendPath);
+  }
+
+  // Serve static files from the frontend build directory
+  app.use(express.static(frontendPath));
+  console.log('Static files being served from:', frontendPath);
+
+  // Handle all other routes by serving the frontend
+  app.get('*', (req: Request, res: Response) => {
+    const indexPath = path.join(frontendPath, 'index.html');
+    console.log('Serving index.html from:', indexPath);
+    res.sendFile(indexPath);
+  });
+
 }
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
