@@ -32,39 +32,20 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-
-
-// app.use((req: Request, res: Response, next: NextFunction) => {
-//   res.setHeader('Access-Control-Allow-Origin', '*');
-//   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, OPTIONS, DELETE');
-
-//   // Preflight CORS handler
-//   if (req.method === 'OPTIONS') {
-//     res.status(200).json({
-//       body: "OK"
-//     });
-//     return;
-//   }
-//   next();
-// });
-
-
-
 // Routes
-app.use('/api', authRoutes);
-app.use('/api/customer', customerRoutes);
-app.use('/api/user', userRoutes);
-app.use('/api/movies', movieRoutes);
-app.use('/api/theaters', theaterRoutes);
-app.use('/api/staff', staffRoutes);
-app.use('/api/seats', seatRoutes);
-app.use('/api/showtimes', showtimeRoutes);
-app.use('/api/tickets', ticketRoutes);
-app.use('/api/payments', paymentRoutes);
-app.use('/api/admin', adminRoutes);
+app.use('/', authRoutes);
+app.use('/customer', customerRoutes);
+app.use('/user', userRoutes);
+app.use('/movies', movieRoutes);
+app.use('/theaters', theaterRoutes);
+app.use('/staff', staffRoutes);
+app.use('/seats', seatRoutes);
+app.use('/showtimes', showtimeRoutes);
+app.use('/tickets', ticketRoutes);
+app.use('/payments', paymentRoutes);
+app.use('/admin', adminRoutes);
 
-app.get('/api', (req: Request, res: Response) => {
+app.get('/', (req: Request, res: Response) => {
   res.send('Backend server is running!');
 });
 
