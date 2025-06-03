@@ -56,13 +56,8 @@ app.use('/tickets', ticketRoutes);
 app.use('/payments', paymentRoutes);
 app.use('/admin', adminRoutes);
 
-if (process.env.NODE_ENV === 'development') {
-  // Dev mode root route message
-  app.get('/', (req: Request, res: Response) => {
-    res.send('Backend server is running!');
-  });
-  
-} else {
+
+
   const frontendPath = path.join(__dirname, '../frontend/dist');
   console.log('Production mode - Frontend path:', frontendPath);
   
@@ -82,7 +77,7 @@ if (process.env.NODE_ENV === 'development') {
     res.sendFile(indexPath);
   });
 
-}
+
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
