@@ -22,6 +22,9 @@ import adminRoutes from './routes/admin.route';
 dotenv.config();
 connectDB(process.env.MONGO_URI as string);
 
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('All env vars:', Object.keys(process.env));
+
 const app = express();
 
 // Middleware
