@@ -55,13 +55,19 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 
-if(process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
-}
+if (process.env.NODE_ENV === 'production') {
+  const frontendPath = path.join(__dirname, '../frontend/dist');
+  app.use(express.static(frontendPath));
 
-app.get('*', (req: Request, res: Response) => {
-  res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
-});
+  app.get('*', (req: Request, res: Response) => {
+    res.sendFile(path.join(frontendPath, 'index.html'));
+  });
+} else {
+  // Dev mode root route message
+  app.get('/', (req: Request, res: Response) => {
+    res.send('Backend server is running!');
+  });
+}
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
