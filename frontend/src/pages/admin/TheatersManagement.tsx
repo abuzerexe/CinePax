@@ -214,7 +214,7 @@ const TheatersManagement = () => {
                   <TableHead>Capacity</TableHead>
                   <TableHead>Screens</TableHead>
                   <TableHead>Amenities</TableHead>
-                  {isAdmin() && <TableHead className="text-right">Actions</TableHead>}
+                  {isAdmin() && <TableHead className="text-center">Actions</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -226,8 +226,8 @@ const TheatersManagement = () => {
                     <TableCell>{theater.screens}</TableCell>
                     <TableCell>{theater.amenities?.join(", ") || "None"}</TableCell>
                     {isAdmin() && (
-                      <TableCell>
-                        <div className="flex justify-end gap-2">
+                      <TableCell className="text-center">
+                        <div className="flex justify-center gap-2">
                           <Button variant="outline" size="sm" onClick={() => handleOpenDialog(theater)}>
                             <Edit className="h-4 w-4" />
                           </Button>

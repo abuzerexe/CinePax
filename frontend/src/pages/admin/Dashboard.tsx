@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Film, MapPin, Users, Ticket, TrendingUp, DollarSign } from "lucide-react"
 import { useNavigate } from "react-router-dom"
-import { movies, theaters, users, tickets } from "../../services/api"
+import { movies, theaters, users, bookings, payments } from "../../services/api"
 import { useAuth } from "../../contexts/AuthContext"
 
 interface Stats {
@@ -30,9 +30,14 @@ interface Theater {
 }
 
 interface Booking {
-  _id: string
-  status: string
-  totalAmount: number
+  status: 'pending' | 'confirmed' | 'cancelled';
+  totalAmount: number;
+}
+
+interface Payment {
+  ticket: {
+    price: number;
+  };
 }
 
 const Dashboard = () => {
@@ -61,36 +66,36 @@ const Dashboard = () => {
       try {
         setLoading(true)
         setError(null)
-        const [moviesResponse, theatersResponse, usersResponse, ticketsResponse] = await Promise.all([
-          movies.getAll(),
+        const [moviesResponse, theatersResponse, usersResponse, bookingsResponse, paymentsResponse] = await Promise.all([
+          movies.getAll({ limit: 1000 }),
           theaters.getAll(),
           users.getAll(),
-          tickets.getAll()
+          bookings.getAll(),
+          payments.getAll()
         ])
         
         const moviesList = moviesResponse.data || []
         const theatersList = theatersResponse.data || []
         const usersList = usersResponse.data || []
-        const bookingsList = ticketsResponse.data || []
+        const bookingsList = bookingsResponse.data || []
+        const paymentsList = paymentsResponse.data || []
 
-        const activeMovies = moviesList.filter((movie: Movie) => movie.status === "active").length
-        const activeTheaters = theatersList.filter((theater: Theater) => theater.status === "active").length
         const pendingBookings = bookingsList.filter((booking: Booking) => booking.status === "pending").length
-        const totalRevenue = bookingsList.reduce((sum: number, booking: Booking) => sum + (booking.totalAmount || 0), 0)
+        const totalRevenue = paymentsList.reduce((sum: number, payment: Payment) => sum + (payment.ticket?.price || 0), 0)
 
         setStats({
-          totalMovies: moviesList.length,
+          totalMovies: moviesResponse.total || moviesList.length,
           totalTheaters: theatersList.length,
           totalUsers: usersList.length,
           totalBookings: bookingsList.length,
-          activeMovies,
-          activeTheaters,
+          activeMovies: moviesResponse.total || moviesList.length,
+          activeTheaters: theatersList.length,
           pendingBookings,
           totalRevenue,
         })
-      } catch (error: any) {
+      } catch (error) {
         console.error("Error fetching stats:", error)
-        setError(error.response?.data?.message || "Failed to fetch dashboard data")
+        setError("Failed to load dashboard stats")
       } finally {
         setLoading(false)
       }

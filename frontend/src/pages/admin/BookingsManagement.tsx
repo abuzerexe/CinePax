@@ -179,22 +179,25 @@ const BookingsManagement = () => {
 
         <Card className="mb-6">
           <CardContent className="pt-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="relative">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search bookings..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-8"
-                />
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="space-y-2">
+                <Label>Search</Label>
+                <div className="relative">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search bookings..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-8"
+                  />
+                </div>
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label>Status</Label>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Statuses</SelectItem>
@@ -205,11 +208,11 @@ const BookingsManagement = () => {
                 </Select>
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label>Payment Status</Label>
                 <Select value={paymentFilter} onValueChange={setPaymentFilter}>
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Select payment status" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Payments</SelectItem>
@@ -221,7 +224,8 @@ const BookingsManagement = () => {
                 </Select>
               </div>
 
-              <div className="flex items-end">
+              <div className="space-y-2">
+                <Label className="opacity-0">Clear</Label>
                 <Button
                   variant="outline"
                   className="w-full"
@@ -249,7 +253,7 @@ const BookingsManagement = () => {
               <TableHead>Seat</TableHead>
               <TableHead>Amount</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="text-center">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -280,8 +284,8 @@ const BookingsManagement = () => {
                 <TableCell>
                   <Badge className={getStatusColor(booking.status)}>{booking.status}</Badge>
                 </TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
+                <TableCell className="text-center">
+                  <div className="flex justify-center gap-2">
                     {booking.status === "pending" && (
                       <>
                         <Button

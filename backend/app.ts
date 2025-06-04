@@ -17,6 +17,7 @@ import ticketRoutes from './routes/ticket.route';
 import paymentRoutes from './routes/payment.route';
 import userRoutes from './routes/user.route';
 import adminRoutes from './routes/admin.route';
+import bookingRoutes from './routes/booking.route';
 
 dotenv.config();
 connectDB(process.env.MONGO_URI as string);
@@ -76,6 +77,7 @@ app.use('/api/showtimes', showtimeRoutes);
 app.use('/api/tickets', ticketRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/bookings', bookingRoutes);
 
 
 if (process.env.NODE_ENV !== 'development') { 

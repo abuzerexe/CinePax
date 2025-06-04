@@ -9,14 +9,16 @@ type PaymentStatus = 'PENDING' | 'COMPLETED' | 'FAILED';
 interface PaymentStats {
   total: number;
   totalAmount: number;
-  byPaymentMethod: Record<PaymentMethod, { count: number; amount: number }>;
-  byStatus: Record<PaymentStatus, { count: number; amount: number }>;
+  byPaymentMethod: {
+    [key in PaymentMethod]: { count: number; amount: number };
+  };
+  byStatus: {
+    [key in PaymentStatus]: { count: number; amount: number };
+  };
 }
 
-interface PopulatedPayment extends Document {
+interface PopulatedPayment extends IPayment {
   ticket: ITicket;
-  paymentMethod: PaymentMethod;
-  paymentStatus: PaymentStatus;
 }
 
 export const getAllPayments = async (req: Request, res: Response): Promise<void> => {
@@ -28,8 +30,8 @@ export const getAllPayments = async (req: Request, res: Response): Promise<void>
           {
             path: 'showtime',
             populate: [
-              { path: 'movie', select: 'title' },
-              { path: 'theater', select: 'name location' }
+              { path: 'movieId', select: 'title' },
+              { path: 'theaterId', select: 'name location' }
             ]
           },
           { path: 'customer', select: 'fullName email phone' },
@@ -53,14 +55,19 @@ export const getAllPayments = async (req: Request, res: Response): Promise<void>
     };
 
     payments.forEach((payment) => {
-      const amount = payment.ticket.price;
+      // Safely access the price, defaulting to 0 if not available
+      const amount = payment.ticket?.price || 0;
       stats.totalAmount += amount;
       
-      stats.byPaymentMethod[payment.paymentMethod].count++;
-      stats.byPaymentMethod[payment.paymentMethod].amount += amount;
+      if (payment.paymentMethod in stats.byPaymentMethod) {
+        stats.byPaymentMethod[payment.paymentMethod].count++;
+        stats.byPaymentMethod[payment.paymentMethod].amount += amount;
+      }
       
-      stats.byStatus[payment.paymentStatus].count++;
-      stats.byStatus[payment.paymentStatus].amount += amount;
+      if (payment.paymentStatus in stats.byStatus) {
+        stats.byStatus[payment.paymentStatus].count++;
+        stats.byStatus[payment.paymentStatus].amount += amount;
+      }
     });
 
     res.status(200).json({
@@ -70,6 +77,7 @@ export const getAllPayments = async (req: Request, res: Response): Promise<void>
       data: payments
     });
   } catch (err: any) {
+    console.error('Error in getAllPayments:', err);
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
@@ -102,8 +110,8 @@ export const getPaymentsByDateRange = async (req: Request<{}, {}, {}, { startDat
         {
           path: 'showtime',
           populate: [
-            { path: 'movie', select: 'title' },
-            { path: 'theater', select: 'name location' }
+            { path: 'movieId', select: 'title' },
+            { path: 'theaterId', select: 'name location' }
           ]
         },
         { path: 'customer', select: 'fullName email phone' },
@@ -127,14 +135,19 @@ export const getPaymentsByDateRange = async (req: Request<{}, {}, {}, { startDat
     };
 
     payments.forEach((payment) => {
-      const amount = payment.ticket.price;
+      // Safely access the price, defaulting to 0 if not available
+      const amount = payment.ticket?.price || 0;
       stats.totalAmount += amount;
       
-      stats.byPaymentMethod[payment.paymentMethod].count++;
-      stats.byPaymentMethod[payment.paymentMethod].amount += amount;
+      if (payment.paymentMethod in stats.byPaymentMethod) {
+        stats.byPaymentMethod[payment.paymentMethod].count++;
+        stats.byPaymentMethod[payment.paymentMethod].amount += amount;
+      }
       
-      stats.byStatus[payment.paymentStatus].count++;
-      stats.byStatus[payment.paymentStatus].amount += amount;
+      if (payment.paymentStatus in stats.byStatus) {
+        stats.byStatus[payment.paymentStatus].count++;
+        stats.byStatus[payment.paymentStatus].amount += amount;
+      }
     });
 
     res.status(200).json({
@@ -148,6 +161,7 @@ export const getPaymentsByDateRange = async (req: Request<{}, {}, {}, { startDat
       data: payments
     });
   } catch (err: any) {
+    console.error('Error in getPaymentsByDateRange:', err);
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 }; 

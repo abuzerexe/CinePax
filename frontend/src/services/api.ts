@@ -223,6 +223,10 @@ export const tickets = {
 }
 
 export const payments = {
+  getAll: async () => {
+    const response = await api.get("/payments")
+    return response.data
+  },
   create: async (paymentData: {
     bookingId: string;
     amount: number;
@@ -265,4 +269,26 @@ export const users = {
     const response = await api.delete(`/admin/users/${id}`)
     return response.data
   },
+}
+
+export const bookings = {
+  getAll: async () => {
+    const response = await api.get("/bookings")
+    return response.data
+  },
+  getById: async (id: string) => {
+    const response = await api.get(`/bookings/${id}`)
+    return response.data
+  },
+  update: async (id: string, bookingData: {
+    status?: 'pending' | 'confirmed' | 'cancelled';
+    paymentStatus?: 'pending' | 'paid' | 'failed' | 'refunded';
+  }) => {
+    const response = await api.put(`/bookings/${id}/status`, bookingData)
+    return response.data
+  },
+  delete: async (id: string) => {
+    const response = await api.delete(`/bookings/${id}`)
+    return response.data
+  }
 }

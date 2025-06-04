@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Edit, Trash2, Plus, Search } from "lucide-react"
 import { movies } from "../../services/api"
 import useToast from "@/components/ui/use-toast"
+import { useDebounce } from "@/hooks/useDebounce"
 
 interface Movie {
   _id: string
@@ -32,7 +33,9 @@ const MoviesManagement = () => {
   const [openDialog, setOpenDialog] = useState(false)
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
+  const debouncedSearchQuery = useDebounce(searchQuery, 300)
   const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
   const itemsPerPage = 10
   const [formData, setFormData] = useState<Partial<Movie>>({
     title: "",
@@ -49,10 +52,15 @@ const MoviesManagement = () => {
     const fetchMovies = async () => {
       try {
         setLoading(true)
-        const response = await movies.getAll()
-        const moviesData = response.data || []
-        setMovies(moviesData)
-        setFilteredMovies(moviesData)
+        const response = await movies.getAll({
+          page: currentPage,
+          limit: itemsPerPage,
+          search: debouncedSearchQuery
+        })
+        const paginatedData = response
+        setMovies(paginatedData.data)
+        setFilteredMovies(paginatedData.data)
+        setTotalPages(paginatedData.totalPages)
       } catch (error) {
         console.error("Error fetching movies:", error)
         setMovies([])
@@ -63,16 +71,11 @@ const MoviesManagement = () => {
     }
 
     fetchMovies()
-  }, [])
+  }, [currentPage, debouncedSearchQuery])
 
   useEffect(() => {
-    const filtered = moviesList.filter(movie =>
-      movie.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      movie.genre.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    setFilteredMovies(filtered)
     setCurrentPage(1)
-  }, [searchQuery, moviesList])
+  }, [debouncedSearchQuery])
 
   const handleOpenDialog = (movie?: Movie) => {
     if (movie) {
@@ -156,12 +159,6 @@ const MoviesManagement = () => {
     }
   }
 
-  const totalPages = Math.ceil(filteredMovies.length / itemsPerPage)
-  const paginatedMovies = filteredMovies.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  )
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -206,19 +203,19 @@ const MoviesManagement = () => {
                   <TableHead>Duration</TableHead>
                   <TableHead>Release Date</TableHead>
                   <TableHead>Rating</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead className="text-center">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedMovies.map((movie) => (
+                {filteredMovies.map((movie) => (
                   <TableRow key={movie._id}>
                     <TableCell className="font-medium">{movie.title}</TableCell>
                     <TableCell>{movie.genre}</TableCell>
                     <TableCell>{movie.duration} min</TableCell>
                     <TableCell>{new Date(movie.releaseDate).toLocaleDateString()}</TableCell>
                     <TableCell>{movie.rating}/10</TableCell>
-                    <TableCell>
-                      <div className="flex justify-end gap-2">
+                    <TableCell className="text-center">
+                      <div className="flex justify-center gap-2">
                         <Button variant="outline" size="sm" onClick={() => handleOpenDialog(movie)}>
                           <Edit className="h-4 w-4" />
                         </Button>
