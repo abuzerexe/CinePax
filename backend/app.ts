@@ -39,7 +39,7 @@ if (process.env.NODE_ENV === 'development') {
     res.send('Backend server is running!');
   });
 } else {
-  const frontendPath = path.join(__dirname, '../frontend/dist');
+  const frontendPath = path.join(__dirname, '../../frontend/dist');
   console.log('Production mode - Frontend path:', frontendPath);
   
 
@@ -85,7 +85,7 @@ if (process.env.NODE_ENV !== 'development') {
       return next();
     }
     
-    const indexPath = path.join(__dirname, '../frontend/dist', 'index.html');
+    const indexPath = path.join(__dirname, '../../frontend/dist', 'index.html');
     console.log('Serving index.html from:', indexPath);
     res.sendFile(indexPath, (err) => {
       if (err) {
