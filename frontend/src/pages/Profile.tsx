@@ -43,7 +43,6 @@ const Profile = () => {
   const { user,  } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
   const [bookingHistory, setBookingHistory] = useState<Booking[]>([])
-  const [loading, setLoading] = useState(false)
   const [isCanceling, setIsCanceling] = useState<string | null>(null)
   const { toast } = useToast()
   const [formData, setFormData] = useState({
