@@ -119,14 +119,12 @@ const MovieDetails = () => {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Movie Poster */}
           <div className="lg:col-span-1">
             <div className="sticky top-8">
               <img src={movie.image || "https://placehold.co/600x900/e2e8f0/cbd5e1?text=Movie"} alt={movie.title} className="w-full rounded-lg shadow-2xl" />
             </div>
           </div>
 
-          {/* Movie Info */}
           <div className="lg:col-span-2 space-y-6">
             <div>
               <h1 className="text-4xl md:text-5xl font-bold mb-4">{movie.title}</h1>
@@ -166,14 +164,13 @@ const MovieDetails = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" onClick={() => handleBookTicket()} className="flex-1">
+              <Button size="lg" onClick={() => handleBookTicket()} className="w-full sm:w-auto min-w-[200px]">
                 Book Tickets
               </Button>
             </div>
           </div>
         </div>
 
-        {/* Showtimes Section */}
         <div id="showtimes-section" className="mt-12">
           <h2 className="text-3xl font-bold mb-8">Showtimes</h2>
           {movie._id && <MovieShowtimes movieId={movie._id} showtimes={movie.showtimes || []} />}

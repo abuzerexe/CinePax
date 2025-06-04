@@ -242,7 +242,6 @@ const Booking = () => {
         <h1 className="text-4xl font-bold mb-8">Book Your Tickets</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Movie and Showtime Info */}
           <div className="lg:col-span-2 space-y-6">
             <Card>
               <CardHeader>
@@ -279,7 +278,6 @@ const Booking = () => {
               </CardContent>
             </Card>
 
-            {/* Seat Selection */}
             <Card>
               <CardHeader>
                 <CardTitle>Select Your Seats</CardTitle>
@@ -313,7 +311,6 @@ const Booking = () => {
             </Card>
           </div>
 
-          {/* Booking Summary */}
           <div className="space-y-6">
             <Card>
               <CardHeader>

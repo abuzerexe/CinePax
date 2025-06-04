@@ -44,7 +44,6 @@ export default function Navigation() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <Film className="h-6 w-6 text-purple-600" />
             <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
@@ -52,7 +51,6 @@ export default function Navigation() {
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
             {navItems.map((item) => (
               <Link
@@ -82,9 +80,7 @@ export default function Navigation() {
             )}
           </nav>
 
-          {/* User Menu / Auth Buttons */}
           <div className="flex items-center space-x-4">
-            {/* Dark Mode Toggle */}
             <Button variant="ghost" size="icon" onClick={toggleDarkMode} className="h-8 w-8">
               {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               <span className="sr-only">Toggle theme</span>
@@ -127,7 +123,6 @@ export default function Navigation() {
               </div>
             )}
 
-            {/* Mobile Menu */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="md:hidden">
@@ -137,10 +132,7 @@ export default function Navigation() {
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[400px] pt-4">
                 <nav className="flex flex-col ml-2 mr-2">
-                  <Link to="/" className="flex items-center space-x-2 mb-3">
-                    <Film className="h-6 w-6 text-purple-600" />
-                    <span className="text-xl font-bold">CinePax</span>
-                  </Link>
+                  <div className="mb-8"></div>
 
                   {navItems.map((item) => (
                     <Link
@@ -173,22 +165,7 @@ export default function Navigation() {
                     </>
                   )}
 
-                  {/* Dark Mode Toggle in Mobile Menu */}
-                  <div className="border-t my-2">
-                    <Button variant="ghost" onClick={toggleDarkMode} className="w-full justify-start py-2">
-                      {darkMode ? (
-                        <>
-                          <Sun className="mr-2 h-4 w-4" />
-                          <span>Light Mode</span>
-                        </>
-                      ) : (
-                        <>
-                          <Moon className="mr-2 h-4 w-4" />
-                          <span>Dark Mode</span>
-                        </>
-                      )}
-                    </Button>
-                  </div>
+
 
                   {!user && (
                     <div className="flex flex-col space-y-2 border-t my-2">

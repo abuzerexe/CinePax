@@ -33,7 +33,6 @@ function App() {
           <ScrollToTop />
           <Layout>
             <Routes>
-              {/* Public Routes */}
               <Route path="/" element={<Home />} />
               <Route path="/movies" element={<Movies />} />
               <Route path="/movies/:id" element={<MovieDetails />} />
@@ -42,7 +41,6 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
 
-              {/* Protected Admin Routes */}
               <Route
                 path="/admin"
                 element={
@@ -84,7 +82,6 @@ function App() {
                 }
               />
 
-              {/* User Routes */}
               <Route
                 path="/profile"
                 element={
@@ -118,7 +115,6 @@ function App() {
                 }
               />
 
-              {/* Catch all route */}
               <Route
                 path="*"
                 element={

@@ -224,7 +224,6 @@ const MyBookings = () => {
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold mb-8">My Bookings</h1>
 
-        {/* Filters */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -248,20 +247,17 @@ const MyBookings = () => {
           </Select>
         </div>
 
-        {/* Results Count */}
         <div className="mb-6">
           <p className="text-muted-foreground">
             Showing {filteredBookings.length} of {bookings.length} bookings
           </p>
         </div>
 
-        {/* Bookings List */}
         <div className="space-y-6">
           {filteredBookings.map((booking) => (
             <Card key={booking.bookingId} className="overflow-hidden">
               <CardContent className="p-0">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-0">
-                  {/* Movie Poster */}
                   <div className="md:col-span-1">
                     <img
                       src={booking.movie.posterUrl}
@@ -270,7 +266,6 @@ const MyBookings = () => {
                     />
                   </div>
 
-                  {/* Booking Details */}
                   <div className="md:col-span-3 p-6">
                     <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4">
                       <div>

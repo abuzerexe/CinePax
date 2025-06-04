@@ -212,7 +212,6 @@ const TheaterShowtimes = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        {/* Theater Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">{theater.name}</h1>
           <p className="text-muted-foreground flex items-center">
@@ -221,7 +220,6 @@ const TheaterShowtimes = () => {
           </p>
         </div>
 
-        {/* Filters */}
         <div className="mb-8 space-y-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
@@ -246,7 +244,6 @@ const TheaterShowtimes = () => {
           </div>
         </div>
 
-        {/* Showtimes */}
         <div className="space-y-6">
           {filteredShowtimes.length === 0 ? (
             <div className="text-center py-8">
@@ -258,7 +255,6 @@ const TheaterShowtimes = () => {
                 <Card key={showtime._id} className="overflow-hidden">
                   <CardContent className="p-0">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-0">
-                      {/* Movie Poster */}
                       <div className="md:col-span-1">
                         <div className="w-full h-48 md:h-full bg-gray-200 flex items-center justify-center">
                           <img
@@ -270,7 +266,6 @@ const TheaterShowtimes = () => {
                         </div>
                       </div>
 
-                      {/* Showtime Details */}
                       <div className="md:col-span-3 p-6">
                         <div className="flex justify-between items-start mb-4">
                           <div>
@@ -344,7 +339,6 @@ const TheaterShowtimes = () => {
                 </Card>
               ))}
               
-              {/* Pagination */}
               {totalPages > 1 && (
                 <div className="flex justify-center gap-2 mt-8">
                   <Button

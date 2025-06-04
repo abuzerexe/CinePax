@@ -122,7 +122,6 @@ const Movies = () => {
             Discover and book tickets for the latest movies showing in our theaters
           </p>
 
-          {/* Search & Filters */}
           <div className="max-w-4xl mx-auto space-y-4">
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="relative flex-1">
@@ -201,7 +200,6 @@ const Movies = () => {
           </p>
         </div>
 
-        {/* Movies Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredMovies.map((movie) => (
             <Card key={movie._id} className="overflow-hidden hover:shadow-xl transition-shadow duration-300">
@@ -231,7 +229,6 @@ const Movies = () => {
           ))}
         </div>
 
-        {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex justify-center mt-10 gap-4 items-center">
             <Button

@@ -76,14 +76,12 @@ const Theaters = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Our Theaters</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
             Discover our premium theater locations with state-of-the-art technology and comfort
           </p>
 
-          {/* Search */}
           <div className="max-w-md mx-auto">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -97,7 +95,6 @@ const Theaters = () => {
           </div>
         </div>
 
-        {/* Theaters Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
           {filteredTheaters.map((theater) => (
             <Card key={theater._id} className="overflow-hidden hover:shadow-xl transition-shadow duration-300">
@@ -124,7 +121,6 @@ const Theaters = () => {
               </CardHeader>
 
               <CardContent className="space-y-4">
-                {/* Amenities */}
                 <div>
                   <h4 className="font-semibold mb-2">Amenities</h4>
                   <div className="flex flex-wrap gap-2">
@@ -140,7 +136,6 @@ const Theaters = () => {
                   </div>
                 </div>
 
-                {/* Theater Info */}
                 <div>
                   <h4 className="font-semibold mb-2">Theater Info</h4>
                   <div className="space-y-2">
