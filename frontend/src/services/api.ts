@@ -213,7 +213,7 @@ export const tickets = {
     status?: 'pending' | 'confirmed' | 'cancelled';
     paymentStatus?: 'pending' | 'paid' | 'failed' | 'refunded';
   }) => {
-    const response = await api.put(`/user/bookings/${id}/status`, { status: bookingData.status })
+    const response = await api.put(`/user/bookings/${id}/status`, bookingData)
     return response.data
   },
   delete: async (id: string) => {

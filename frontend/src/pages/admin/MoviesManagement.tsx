@@ -36,6 +36,8 @@ const MoviesManagement = () => {
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isDeleting, setIsDeleting] = useState<string | null>(null)
   const itemsPerPage = 10
   const [formData, setFormData] = useState<Partial<Movie>>({
     title: "",
@@ -104,6 +106,7 @@ const MoviesManagement = () => {
 
   const handleSubmit = async () => {
     try {
+      setIsSubmitting(true)
       const movieData = {
         ...formData,
         duration: Number(formData.duration),
@@ -136,12 +139,15 @@ const MoviesManagement = () => {
         description: "Failed to save movie. Please try again.",
         variant: "destructive",
       })
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
   const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this movie?")) {
       try {
+        setIsDeleting(id)
         await movies.delete(id)
         setMovies((prev) => prev.filter((movie) => movie._id !== id))
         toast({
@@ -155,6 +161,8 @@ const MoviesManagement = () => {
           description: "Failed to delete movie. Please try again.",
           variant: "destructive",
         })
+      } finally {
+        setIsDeleting(null)
       }
     }
   }
@@ -172,7 +180,11 @@ const MoviesManagement = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-bold">Movies Management</h1>
-          <Button onClick={() => handleOpenDialog()} className="flex items-center gap-2">
+          <Button 
+            onClick={() => handleOpenDialog()} 
+            className="flex items-center gap-2"
+            disabled={loading}
+          >
             <Plus className="h-4 w-4" />
             Add Movie
           </Button>
@@ -186,6 +198,7 @@ const MoviesManagement = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-8"
+              disabled={loading}
             />
           </div>
         </div>
@@ -216,7 +229,12 @@ const MoviesManagement = () => {
                     <TableCell>{movie.rating}/10</TableCell>
                     <TableCell className="text-center">
                       <div className="flex justify-center gap-2">
-                        <Button variant="outline" size="sm" onClick={() => handleOpenDialog(movie)}>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleOpenDialog(movie)}
+                          disabled={loading}
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button
@@ -224,8 +242,13 @@ const MoviesManagement = () => {
                           size="sm"
                           onClick={() => handleDelete(movie._id)}
                           className="text-red-600 hover:text-red-700"
+                          disabled={loading || isDeleting === movie._id}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          {isDeleting === movie._id ? (
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
                         </Button>
                       </div>
                     </TableCell>
@@ -239,7 +262,7 @@ const MoviesManagement = () => {
                 <Button
                   variant="outline"
                   onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
+                  disabled={currentPage === 1 || loading}
                 >
                   Previous
                 </Button>
@@ -249,7 +272,7 @@ const MoviesManagement = () => {
                 <Button
                   variant="outline"
                   onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
+                  disabled={currentPage === totalPages || loading}
                 >
                   Next
                 </Button>
@@ -346,10 +369,16 @@ const MoviesManagement = () => {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={handleCloseDialog}>
+              <Button variant="outline" onClick={handleCloseDialog} disabled={isSubmitting}>
                 Cancel
               </Button>
-              <Button onClick={handleSubmit}>Save</Button>
+              <Button onClick={handleSubmit} disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                ) : (
+                  "Save"
+                )}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

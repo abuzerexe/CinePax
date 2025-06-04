@@ -40,16 +40,23 @@ interface Booking {
 }
 
 const Profile = () => {
-  const { user, updateUser } = useAuth()
+  const { user,  } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
   const [bookingHistory, setBookingHistory] = useState<Booking[]>([])
   const [loading, setLoading] = useState(false)
+  const [isCanceling, setIsCanceling] = useState<string | null>(null)
+  const { toast } = useToast()
   const [formData, setFormData] = useState({
     fullName: user?.fullName || "",
     email: user?.email || "",
     phone: user?.phone || "",
   })
-  const { toast } = useToast()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [originalData, setOriginalData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+  })
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -57,11 +64,13 @@ const Profile = () => {
         const response = await auth.getProfile()
         
         if (response) {
-          setFormData({
+          const newData = {
             fullName: response.fullName || "",
             email: response.email || "",
             phone: response.phone || "",
-          })
+          }
+          setFormData(newData)
+          setOriginalData(newData)
         }
       } catch (error) {
         console.error("Error fetching profile:", error)
@@ -98,60 +107,63 @@ const Profile = () => {
     }
   }, [user?.id])
 
-  const handleSave = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
     try {
-      if (!user?.id) return
-      
-      const response = await auth.updateProfile(formData)
-      updateUser(response.data)
-      setIsEditing(false)
-      
+      setIsSubmitting(true)
+      const updateData = {
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+      }
+      await auth.updateProfile(updateData)
       toast({
         title: "Success",
         description: "Profile updated successfully",
       })
-    } catch (error: any) {
+      setIsEditing(false)
+    } catch (error) {
       console.error("Error updating profile:", error)
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to update profile",
+        description: "Failed to update profile. Please try again.",
         variant: "destructive",
       })
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
   const handleCancel = () => {
-    setFormData({
-      fullName: user?.fullName || "",
-      email: user?.email || "",
-      phone: user?.phone || "",
-    })
+    setFormData(originalData)
     setIsEditing(false)
   }
 
   const handleCancelBooking = async (bookingId: string) => {
-    try {
-      setLoading(true)
-      const response = await tickets.update(bookingId, { status: 'cancelled' })
-      if (response.success) {
-        toast({
-          title: "Booking Cancelled",
-          description: "Your booking has been cancelled successfully.",
-        })
-        const updatedResponse = await tickets.getUserBookings()
-        if (updatedResponse && updatedResponse.data) {
-          setBookingHistory(updatedResponse.data)
+    if (window.confirm("Are you sure you want to cancel this booking?")) {
+      try {
+        setIsCanceling(bookingId)
+        const response = await tickets.update(bookingId, { status: 'cancelled' })
+        if (response.success) {
+          toast({
+            title: "Booking Cancelled",
+            description: "Your booking has been cancelled successfully.",
+          })
+          const updatedResponse = await tickets.getUserBookings()
+          if (updatedResponse && updatedResponse.data) {
+            setBookingHistory(updatedResponse.data)
+          }
         }
+      } catch (error: any) {
+        console.error('Error cancelling booking:', error)
+        toast({
+          title: "Cancellation Failed",
+          description: error.response?.data?.message || "Failed to cancel booking. Please try again.",
+          variant: "destructive"
+        })
+      } finally {
+        setIsCanceling(null)
       }
-    } catch (error: any) {
-      console.error('Error cancelling booking:', error)
-      toast({
-        title: "Cancellation Failed",
-        description: error.response?.data?.message || "Failed to cancel booking. Please try again.",
-        variant: "destructive"
-      })
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -217,47 +229,64 @@ const Profile = () => {
                   </div>
                 </div>
 
-                <div className="grid gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="fullName">Full Name</Label>
-                    <Input
-                      id="fullName"
-                      value={formData.fullName}
-                      onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      disabled={!isEditing}
-                    />
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="fullName">Full Name</Label>
+                      <Input
+                        id="fullName"
+                        value={formData.fullName}
+                        onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                        disabled={!isEditing}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        disabled={!isEditing}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Phone</Label>
+                      <Input
+                        id="phone"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        disabled={!isEditing}
+                      />
+                    </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      disabled={!isEditing}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone</Label>
-                    <Input
-                      id="phone"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      disabled={!isEditing}
-                    />
-                  </div>
-                </div>
-
-                {isEditing && (
-                  <div className="flex gap-4 mt-6">
-                    <Button onClick={handleSave}>Save Changes</Button>
-                    <Button variant="outline" onClick={handleCancel}>
-                      Cancel
-                    </Button>
-                  </div>
-                )}
+                  {isEditing && (
+                    <div className="flex gap-4 mt-6">
+                      <Button type="submit" className="flex-1" disabled={isSubmitting}>
+                        {isSubmitting ? (
+                          <div className="flex items-center gap-2">
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                            Updating...
+                          </div>
+                        ) : (
+                          "Update Profile"
+                        )}
+                      </Button>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={handleCancel}
+                        className="flex-1"
+                        disabled={isSubmitting}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  )}
+                </form>
               </CardContent>
             </Card>
           </TabsContent>
@@ -317,9 +346,14 @@ const Profile = () => {
                               variant="outline"
                               size="sm"
                               onClick={() => handleCancelBooking(booking.bookingId)}
-                              disabled={loading}
+                              disabled={isCanceling === booking.bookingId}
+                              className="text-red-600 hover:text-red-700"
                             >
-                              Cancel
+                              {isCanceling === booking.bookingId ? (
+                                <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                              ) : (
+                                "Cancel"
+                              )}
                             </Button>
                           )}
                         </TableCell>

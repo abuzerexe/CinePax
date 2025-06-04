@@ -32,6 +32,8 @@ const TheatersManagement = () => {
   const [selectedTheater, setSelectedTheater] = useState<Theater | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isDeleting, setIsDeleting] = useState<string | null>(null)
   const itemsPerPage = 10
   const [formData, setFormData] = useState<Partial<Theater>>({
     name: "",
@@ -96,6 +98,7 @@ const TheatersManagement = () => {
 
   const handleSubmit = async () => {
     try {
+      setIsSubmitting(true)
       if (selectedTheater) {
         const response = await theaters.update(selectedTheater._id, formData)
         setTheaters((prev) =>
@@ -121,12 +124,15 @@ const TheatersManagement = () => {
         description: "Failed to save theater. Please try again.",
         variant: "destructive",
       })
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
   const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this theater?")) {
       try {
+        setIsDeleting(id)
         await theaters.delete(id)
         setTheaters((prev) => prev.filter((theater) => theater._id !== id))
         toast({
@@ -140,6 +146,8 @@ const TheatersManagement = () => {
           description: "Failed to delete theater. Please try again.",
           variant: "destructive",
         })
+      } finally {
+        setIsDeleting(null)
       }
     }
   }
@@ -182,7 +190,11 @@ const TheatersManagement = () => {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-bold">Theaters Management</h1>
           {isAdmin() && (
-            <Button onClick={() => handleOpenDialog()} className="flex items-center gap-2">
+            <Button 
+              onClick={() => handleOpenDialog()} 
+              className="flex items-center gap-2"
+              disabled={loading}
+            >
               <Plus className="h-4 w-4" />
               Add Theater
             </Button>
@@ -197,6 +209,7 @@ const TheatersManagement = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-8"
+              disabled={loading}
             />
           </div>
         </div>
@@ -228,7 +241,12 @@ const TheatersManagement = () => {
                     {isAdmin() && (
                       <TableCell className="text-center">
                         <div className="flex justify-center gap-2">
-                          <Button variant="outline" size="sm" onClick={() => handleOpenDialog(theater)}>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => handleOpenDialog(theater)}
+                            disabled={loading}
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
                           <Button
@@ -236,8 +254,13 @@ const TheatersManagement = () => {
                             size="sm"
                             onClick={() => handleDelete(theater._id)}
                             className="text-red-600 hover:text-red-700"
+                            disabled={loading || isDeleting === theater._id}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            {isDeleting === theater._id ? (
+                              <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
                           </Button>
                         </div>
                       </TableCell>
@@ -252,7 +275,7 @@ const TheatersManagement = () => {
                 <Button
                   variant="outline"
                   onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
+                  disabled={currentPage === 1 || loading}
                 >
                   Previous
                 </Button>
@@ -262,7 +285,7 @@ const TheatersManagement = () => {
                 <Button
                   variant="outline"
                   onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
+                  disabled={currentPage === totalPages || loading}
                 >
                   Next
                 </Button>
@@ -330,10 +353,16 @@ const TheatersManagement = () => {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={handleCloseDialog}>
+              <Button variant="outline" onClick={handleCloseDialog} disabled={isSubmitting}>
                 Cancel
               </Button>
-              <Button onClick={handleSubmit}>Save</Button>
+              <Button onClick={handleSubmit} disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                ) : (
+                  "Save"
+                )}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

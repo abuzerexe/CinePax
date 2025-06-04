@@ -150,6 +150,7 @@ const Register = () => {
                     onChange={handleChange}
                     className="pl-10"
                     required
+                    disabled={loading}
                   />
                 </div>
                 {errors.firstName && <p className="text-sm text-red-500">{errors.firstName}</p>}
@@ -167,6 +168,7 @@ const Register = () => {
                     onChange={handleChange}
                     className="pl-10"
                     required
+                    disabled={loading}
                   />
                 </div>
                 {errors.lastName && <p className="text-sm text-red-500">{errors.lastName}</p>}
@@ -186,6 +188,7 @@ const Register = () => {
                   onChange={handleChange}
                   className="pl-10"
                   required
+                  disabled={loading}
                 />
               </div>
               {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
@@ -204,11 +207,13 @@ const Register = () => {
                   onChange={handleChange}
                   className="pl-10 pr-10"
                   required
+                  disabled={loading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  disabled={loading}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -229,11 +234,13 @@ const Register = () => {
                   onChange={handleChange}
                   className="pl-10 pr-10"
                   required
+                  disabled={loading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  disabled={loading}
                 >
                   {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -242,7 +249,14 @@ const Register = () => {
             </div>
 
             <Button type="submit" className="w-full" size="lg" disabled={loading}>
-              {loading ? "Creating account..." : "Create Account"}
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  Creating account...
+                </div>
+              ) : (
+                "Create Account"
+              )}
             </Button>
           </form>
         </CardContent>

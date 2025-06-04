@@ -48,6 +48,7 @@ const MyBookings = () => {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
+  const [isCanceling, setIsCanceling] = useState<string | null>(null)
 
   const fetchBookings = async () => {
     try {
@@ -102,25 +103,25 @@ const MyBookings = () => {
   }
 
   const handleCancelBooking = async (bookingId: string) => {
-    try {
-      setLoading(true)
-      const response = await tickets.update(bookingId, { status: 'cancelled' })
-      if (response.success) {
+    if (window.confirm("Are you sure you want to cancel this booking?")) {
+      try {
+        setIsCanceling(bookingId)
+        await tickets.update(bookingId, { status: 'cancelled' })
         toast({
-          title: "Booking Cancelled",
-          description: "Your booking has been cancelled successfully.",
+          title: "Success",
+          description: "Booking cancelled successfully",
         })
         fetchBookings()
+      } catch (error) {
+        console.error("Error cancelling booking:", error)
+        toast({
+          title: "Error",
+          description: "Failed to cancel booking. Please try again.",
+          variant: "destructive",
+        })
+      } finally {
+        setIsCanceling(null)
       }
-    } catch (error) {
-      console.error('Error cancelling booking:', error)
-      toast({
-        title: "Cancellation Failed",
-        description: "Failed to cancel booking. Please try again.",
-        variant: "destructive"
-      })
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -319,9 +320,14 @@ const MyBookings = () => {
                             variant="outline"
                             size="sm"
                             onClick={() => handleCancelBooking(booking.bookingId)}
-                            disabled={loading}
+                            className="text-red-600 hover:text-red-700"
+                            disabled={isCanceling === booking.bookingId}
                           >
-                            Cancel Booking
+                            {isCanceling === booking.bookingId ? (
+                              <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                            ) : (
+                              "Cancel"
+                            )}
                           </Button>
                         )}
                         {booking.status === 'confirmed' && (

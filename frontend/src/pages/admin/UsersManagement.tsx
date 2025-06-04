@@ -34,6 +34,8 @@ const UsersManagement = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isDeleting, setIsDeleting] = useState<string | null>(null)
   const itemsPerPage = 10
   const [formData, setFormData] = useState<Partial<User>>({
     fullName: "",
@@ -108,6 +110,7 @@ const UsersManagement = () => {
 
   const handleSubmit = async () => {
     try {
+      setIsSubmitting(true)
       if (selectedUser) {
         const response = await users.update(selectedUser._id, formData)
         setUsers((prev) =>
@@ -148,12 +151,15 @@ const UsersManagement = () => {
         description: "Failed to save user. Please try again.",
         variant: "destructive",
       })
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
   const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
+        setIsDeleting(id)
         await users.delete(id)
         setUsers((prev) => prev.filter((user) => user._id !== id))
         toast({
@@ -167,6 +173,8 @@ const UsersManagement = () => {
           description: "Failed to delete user. Please try again.",
           variant: "destructive",
         })
+      } finally {
+        setIsDeleting(null)
       }
     }
   }
@@ -204,7 +212,11 @@ const UsersManagement = () => {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-bold">Users Management</h1>
           {isAdmin() && (
-            <Button onClick={() => handleOpenDialog()} className="flex items-center gap-2">
+            <Button 
+              onClick={() => handleOpenDialog()} 
+              className="flex items-center gap-2"
+              disabled={loading}
+            >
               <Plus className="h-4 w-4" />
               Add User
             </Button>
@@ -219,6 +231,7 @@ const UsersManagement = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-8"
+              disabled={loading}
             />
           </div>
         </div>
@@ -245,7 +258,12 @@ const UsersManagement = () => {
                     <TableCell className="capitalize">{user.role}</TableCell>
                     <TableCell className="text-center">
                       <div className="flex justify-center gap-2">
-                        <Button variant="outline" size="sm" onClick={() => handleOpenDialog(user)}>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleOpenDialog(user)}
+                          disabled={loading}
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button
@@ -253,8 +271,13 @@ const UsersManagement = () => {
                           size="sm"
                           onClick={() => handleDelete(user._id)}
                           className="text-red-600 hover:text-red-700"
+                          disabled={loading || isDeleting === user._id}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          {isDeleting === user._id ? (
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
                         </Button>
                       </div>
                     </TableCell>
@@ -268,7 +291,7 @@ const UsersManagement = () => {
                 <Button
                   variant="outline"
                   onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
+                  disabled={currentPage === 1 || loading}
                 >
                   Previous
                 </Button>
@@ -278,7 +301,7 @@ const UsersManagement = () => {
                 <Button
                   variant="outline"
                   onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
+                  disabled={currentPage === totalPages || loading}
                 >
                   Next
                 </Button>
@@ -354,10 +377,16 @@ const UsersManagement = () => {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={handleCloseDialog}>
+              <Button variant="outline" onClick={handleCloseDialog} disabled={isSubmitting}>
                 Cancel
               </Button>
-              <Button onClick={handleSubmit}>Save</Button>
+              <Button onClick={handleSubmit} disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                ) : (
+                  "Save"
+                )}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

@@ -67,6 +67,10 @@ const Movies = () => {
   const years = Array.from(new Set(moviesList.map((movie) => movie.year))).sort((a, b) => b - a)
 
   useEffect(() => {
+    setCurrentPage(1)
+  }, [debouncedSearchQuery, selectedGenre, selectedYear, sortBy])
+
+  useEffect(() => {
     const fetchMovies = async () => {
       setLoading(true)
       try {
@@ -102,8 +106,6 @@ const Movies = () => {
     setSortBy("title")
     setCurrentPage(1)
   }
-
- 
 
   if (loading) {
     return (
