@@ -19,15 +19,6 @@ interface Stats {
   totalRevenue: number
 }
 
-interface Movie {
-  _id: string
-  status: string
-}
-
-interface Theater {
-  _id: string
-  status: string
-}
 
 interface Booking {
   status: 'pending' | 'confirmed' | 'cancelled';

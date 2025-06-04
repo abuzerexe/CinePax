@@ -27,7 +27,7 @@ interface Movie {
 
 const MoviesManagement = () => {
   const { toast } = useToast()
-  const [moviesList, setMovies] = useState<Movie[]>([])
+  const [, setMovies] = useState<Movie[]>([])
   const [filteredMovies, setFilteredMovies] = useState<Movie[]>([])
   const [loading, setLoading] = useState(true)
   const [openDialog, setOpenDialog] = useState(false)
