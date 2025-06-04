@@ -23,6 +23,7 @@ interface ShowtimeResponse {
     duration: number
     genre: string
     rating: number
+    image : string
   }
 }
 
@@ -38,6 +39,7 @@ interface Showtime {
     duration: number
     genre: string
     rating: number
+    image: string
   }
 }
 
@@ -62,17 +64,15 @@ const TheaterShowtimes = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
 
+
   useEffect(() => {
     const fetchTheaterData = async () => {
       try {
         setLoading(true)
-        // Fetch theater details
         const theaterResponse = await theaters.getById(theaterId!)
         setTheater(theaterResponse.data)
 
-        // Fetch showtimes for this theater
         const showtimesResponse = await theaters.getShowtimes(theaterId!, { page: currentPage, limit: 10 })
-        
         if (showtimesResponse.success && Array.isArray(showtimesResponse.data)) {
           const transformedShowtimes: Showtime[] = showtimesResponse.data.map((showtime: ShowtimeResponse) => ({
             _id: showtime._id,
@@ -85,7 +85,8 @@ const TheaterShowtimes = () => {
               title: showtime.movie.title,
               duration: showtime.movie.duration,
               genre: showtime.movie.genre,
-              rating: showtime.movie.rating
+              rating: showtime.movie.rating,
+              image: showtime.movie.image
             }
           }))
           setShowtimes(transformedShowtimes)
@@ -113,14 +114,12 @@ const TheaterShowtimes = () => {
   useEffect(() => {
     let filtered = [...showtimes]
 
-    // Apply search filter
     if (searchQuery) {
       filtered = filtered.filter(showtime =>
         showtime.movie?.title?.toLowerCase().includes(searchQuery.toLowerCase())
       )
     }
 
-    // Apply date filter
     const today = new Date()
     const todayUTC = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()))
 
@@ -263,9 +262,9 @@ const TheaterShowtimes = () => {
                       <div className="md:col-span-1">
                         <div className="w-full h-48 md:h-full bg-gray-200 flex items-center justify-center">
                           <img
-                            src="/placeholder.svg"
+                            src={showtime.movie?.image}
                             alt={showtime.movie?.title || "Movie poster"}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover cursor-pointer"
                             onClick={() => navigate(`/movies/${showtime.movie?._id}`)}
                           />
                         </div>
@@ -294,7 +293,7 @@ const TheaterShowtimes = () => {
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className="text-2xl font-bold text-purple-600">${showtime.price}</p>
+                            <p className="text-2xl font-bold text-purple-600">Rs. {showtime.price}</p>
                             <p className="text-sm text-muted-foreground">per ticket</p>
                           </div>
                         </div>

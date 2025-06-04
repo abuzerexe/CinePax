@@ -15,7 +15,7 @@ import { tickets, auth } from "../services/api"
 import useToast from "@/components/ui/use-toast"
 
 interface Booking {
-  ticketId: string
+  bookingId: string
   movie: {
     title: string
     duration: number
@@ -43,6 +43,7 @@ const Profile = () => {
   const { user, updateUser } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
   const [bookingHistory, setBookingHistory] = useState<Booking[]>([])
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     fullName: user?.fullName || "",
     email: user?.email || "",
@@ -128,6 +129,32 @@ const Profile = () => {
     setIsEditing(false)
   }
 
+  const handleCancelBooking = async (bookingId: string) => {
+    try {
+      setLoading(true)
+      const response = await tickets.update(bookingId, { status: 'cancelled' })
+      if (response.success) {
+        toast({
+          title: "Booking Cancelled",
+          description: "Your booking has been cancelled successfully.",
+        })
+        const updatedResponse = await tickets.getUserBookings()
+        if (updatedResponse && updatedResponse.data) {
+          setBookingHistory(updatedResponse.data)
+        }
+      }
+    } catch (error: any) {
+      console.error('Error cancelling booking:', error)
+      toast({
+        title: "Cancellation Failed",
+        description: error.response?.data?.message || "Failed to cancel booking. Please try again.",
+        variant: "destructive"
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "confirmed":
@@ -176,9 +203,9 @@ const Profile = () => {
               <CardContent>
                 <div className="flex items-center gap-6 mb-6">
                   <Avatar className="w-20 h-20">
-                    <AvatarImage src="/placeholder.svg" alt="Profile" />
+                    <AvatarImage src="https://avatars.githubusercontent.com/u/140898970?s=400&u=37fd7bdf61f2773df44e33db071c1a4c4bc1604f&v=4" alt="Profile" />
                     <AvatarFallback className="text-lg">
-                      {formData.fullName.split(' ').map(n => n[0]).join('')}
+                      {formData.fullName ? formData.fullName[0].toUpperCase() : formData.email[0].toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div>
@@ -251,12 +278,13 @@ const Profile = () => {
                       <TableHead>Seats</TableHead>
                       <TableHead>Amount</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {bookingHistory.map((booking) => (
-                      <TableRow key={booking.ticketId}>
-                        <TableCell className="font-medium">#{booking.ticketId}</TableCell>
+                      <TableRow key={booking.bookingId}>
+                        <TableCell className="font-medium">#{booking.bookingId}</TableCell>
                         <TableCell>{booking.movie.title}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-1">
@@ -283,8 +311,27 @@ const Profile = () => {
                         <TableCell>
                           <Badge className={getStatusColor(booking.status)}>{booking.status}</Badge>
                         </TableCell>
+                        <TableCell>
+                          {booking.status === 'confirmed' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleCancelBooking(booking.bookingId)}
+                              disabled={loading}
+                            >
+                              Cancel
+                            </Button>
+                          )}
+                        </TableCell>
                       </TableRow>
                     ))}
+                    {bookingHistory.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={8} className="text-center py-8">
+                          <p className="text-muted-foreground">No booking history found.</p>
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>

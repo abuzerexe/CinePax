@@ -8,9 +8,8 @@ import {
 
 const router = express.Router();
 
-// Seat management routes
 router.post('/', verifyToken, isAdmin, addSeat as RequestHandler);
-router.get('/', getAllSeats); // Public route
+router.get('/', getAllSeats); 
 router.delete('/:id', verifyToken, isAdmin, deleteSeat as RequestHandler);
 
 export default router; 

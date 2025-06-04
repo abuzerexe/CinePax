@@ -22,7 +22,16 @@ interface PopulatedTheater {
   capacity: number;
 }
 
-// Add new movie
+interface PopulatedMovie {
+  _id: Types.ObjectId;
+  title: string;
+  description: string;
+  duration: number;
+  genre: string;
+  releaseDate: Date;
+  image: string;
+}
+
 export const addMovie = async (req: Request<{}, {}, MovieRequest>, res: Response) => {
   try {
     const { title, duration, genre, releaseDate, image, description, rating, year } = req.body;
@@ -51,13 +60,55 @@ export const addMovie = async (req: Request<{}, {}, MovieRequest>, res: Response
   }
 };
 
-// Get all movies
 export const getAllMovies = async (req: Request, res: Response) => {
   try {
-    const movies = await Movie.find().sort({ releaseDate: -1 });
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 16;
+    const skip = (page - 1) * limit;
+    const search = req.query.search as string;
+    const genre = req.query.genre as string;
+    const year = req.query.year as string;
+    const sortBy = req.query.sortBy as string || 'title';
+
+    const query: any = {};
+    if (search) {
+      query.title = { $regex: search, $options: 'i' };
+    }
+    if (genre && genre !== 'all') {
+      query.genre = genre;
+    }
+    if (year && year !== 'all') {
+      query.year = parseInt(year);
+    }
+
+    const sort: any = {};
+    switch (sortBy) {
+      case 'title':
+        sort.title = 1;
+        break;
+      case 'year':
+        sort.year = -1;
+        break;
+      case 'rating':
+        sort.rating = -1;
+        break;
+      default:
+        sort.title = 1;
+    }
+
+    const total = await Movie.countDocuments(query);
+
+    const movies = await Movie.find(query)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit);
+
     res.status(200).json({
       success: true,
       count: movies.length,
+      total,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
       data: movies
     });
   } catch (err: any) {
@@ -65,7 +116,6 @@ export const getAllMovies = async (req: Request, res: Response) => {
   }
 };
 
-// Delete movie
 export const deleteMovie = async (req: Request<{ id: string }>, res: Response) => {
   try {
     const { id } = req.params;
@@ -94,12 +144,10 @@ export const getMovieById = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Movie not found' });
     }
 
-    // Fetch showtimes for this movie
     const showtimes = await Showtime.find({ movieId: id })
       .populate<{ theaterId: PopulatedTheater }>('theaterId', 'name location capacity')
       .lean();
 
-    // Get seat availability for each showtime
     const showtimesWithAvailability = await Promise.all(showtimes.map(async (showtime) => {
       const bookedTickets = await Ticket.find({ showtime: showtime._id });
       const bookedSeats = bookedTickets.map(ticket => ticket.seat);
@@ -145,7 +193,6 @@ export const getTheaterShowtimes = async (req: Request, res: Response) => {
   }
 };
 
-// Get featured movies (most recent with highest ratings)
 export const getFeaturedMovies = async (req: Request, res: Response) => {
   try {
     // const movies = await Movie.find()
@@ -175,7 +222,6 @@ export const getFeaturedMovies = async (req: Request, res: Response) => {
   }
 };
 
-// Update movie
 export const updateMovie = async (req: Request<{ id: string }, {}, MovieRequest>, res: Response) => {
   try {
     const { id } = req.params;
@@ -207,6 +253,107 @@ export const updateMovie = async (req: Request<{ id: string }, {}, MovieRequest>
     res.status(200).json({
       success: true,
       data: movie
+    });
+  } catch (err: any) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+export const getMovieDetails = async (req: Request<{ movieId: string }>, res: Response): Promise<void> => {
+  try {
+    const { movieId } = req.params;
+
+    const movie = await Movie.findById(movieId).lean();
+    if (!movie) {
+      res.status(404).json({ message: 'Movie not found' });
+      return;
+    }
+
+    const showtimes = await Showtime.find({ movieId })
+      .populate<{ theaterId: PopulatedTheater }>('theaterId', 'name location capacity')
+      .lean();
+
+    const showtimesWithAvailability = await Promise.all(showtimes.map(async (showtime) => {
+      const bookedTickets = await Ticket.find({ 
+        showtime: showtime._id,
+        status: { $ne: 'cancelled' }
+      });
+       console.log(bookedTickets)
+      const bookedSeats = bookedTickets.length;
+      console.log(bookedSeats)
+
+      const availableSeats = showtime.theaterId.capacity - bookedSeats;
+      console.log(availableSeats)
+
+      return {
+        id: showtime._id,
+        theater: showtime.theaterId,
+        startTime: showtime.startTime,
+        endTime: showtime.endTime,
+        price: showtime.price,
+        availableSeats,
+        bookedSeats
+      };
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: {
+        ...movie,
+        showtimes: showtimesWithAvailability
+      }
+    });
+  } catch (err: any) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+export const getShowtimeDetails = async (req: Request<{ showtimeId: string }>, res: Response): Promise<void> => {
+  try {
+    const { showtimeId } = req.params;
+
+    const showtime = await Showtime.findById(showtimeId)
+      .populate<{ movieId: PopulatedMovie }>('movieId', 'title description duration genre releaseDate image')
+      .populate<{ theaterId: PopulatedTheater }>('theaterId', 'name location capacity')
+      .lean();
+
+    if (!showtime) {
+      res.status(404).json({ message: 'Showtime not found' });
+      return;
+    }
+
+    const bookedTickets = await Ticket.find({ 
+      showtime: showtimeId, 
+      status: { $ne: 'cancelled' } 
+    })
+      .populate<{ seat: { seatNumber: string; row: string } }>('seat', 'seatNumber row')
+      .lean();
+
+    const bookedSeats = bookedTickets.map(ticket => {
+      const seat = ticket.seat as { seatNumber: string; row: string };
+      return {
+        seatNumber: seat.seatNumber,
+        row: seat.row,
+        seatId: `${seat.row}${seat.seatNumber}`,
+        name: `Seat ${seat.row}${seat.seatNumber}`
+      };
+    });
+
+    const availableSeats = showtime.theaterId.capacity - bookedSeats.length;
+
+    res.status(200).json({
+      success: true,
+      data: {
+        ...showtime,
+        availableSeats,
+        bookedSeats: bookedSeats.length,
+        seatAvailability: {
+          total: showtime.theaterId.capacity,
+          available: availableSeats,
+          booked: bookedSeats.length
+        },
+        bookedSeatsList: bookedSeats
+      }
     });
   } catch (err: any) {
     res.status(500).json({ message: 'Server error', error: err.message });

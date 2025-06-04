@@ -27,7 +27,7 @@ const MovieCard = ({ _id, title, image, description, genre, year, rating, durati
     >
       <div className="relative overflow-hidden">
         <img
-          src={image || "/placeholder.svg?height=600&width=400"}
+          src={image || "https://placehold.co/400x600/e2e8f0/cbd5e1?text=Movie"}
           alt={title}
           className="aspect-[2/3] object-cover transition-transform duration-300 group-hover:scale-105 w-full"
         />

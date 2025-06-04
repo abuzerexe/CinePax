@@ -3,9 +3,9 @@ import { AuthProvider } from "./contexts/AuthContext"
 import { ThemeProvider } from "./contexts/ThemeContext"
 import Layout from "./components/Layout"
 import ProtectedRoute from "./components/ProtectedRoute"
+import ScrollToTop from "./components/ScrollToTop"
 import { Toaster } from "@/components/ui/toaster"
 
-// Public Pages
 import Home from "./pages/Home"
 import Movies from "./pages/Movies"
 import MovieDetails from "./pages/MovieDetails"
@@ -13,14 +13,12 @@ import Theaters from "./pages/Theaters"
 import Login from "./pages/Login"
 import Register from "./pages/Register"
 
-// Admin Pages
 import Dashboard from "./pages/admin/Dashboard"
 import MoviesManagement from "./pages/admin/MoviesManagement"
 import TheatersManagement from "./pages/admin/TheatersManagement"
 import UsersManagement from "./pages/admin/UsersManagement"
 import BookingsManagement from "./pages/admin/BookingsManagement"
 
-// User Pages
 import Profile from "./pages/Profile"
 import Booking from "./pages/Booking"
 import BookingConfirmation from "./pages/BookingConfirmation"
@@ -32,6 +30,7 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <Router>
+          <ScrollToTop />
           <Layout>
             <Routes>
               {/* Public Routes */}

@@ -1,4 +1,4 @@
-import { Film, Mail, Phone, MapPin } from "lucide-react"
+import { Film, Mail, UserSearch, MapPin } from "lucide-react"
 import { Link } from "react-router-dom"
 
 export default function Footer() {
@@ -49,7 +49,7 @@ export default function Footer() {
             <h3 className="font-semibold mb-4">Support</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/help" className="text-slate-300 hover:text-white transition-colors">
+                <Link to="/" className="text-slate-300 hover:text-white transition-colors">
                   Help Center
                 </Link>
               </li>
@@ -76,10 +76,13 @@ export default function Footer() {
             <h3 className="font-semibold mb-4">Contact Info</h3>
             <ul className="space-y-2 text-sm">
               <li className="flex items-center space-x-2">
-                <Phone className="h-4 w-4 text-purple-400" />
+                <UserSearch className="h-4 w-4 text-purple-400" />
                 <span className="text-slate-300">https://www.linkedin.com/in/abuzerzia/</span>
               
-                {/* <span className="text-slate-300">https://github.com/abuzerexe</span> */}
+              </li>
+              <li className="flex items-center space-x-2">
+                <UserSearch className="h-4 w-4 text-purple-400" />
+                 <span className="text-slate-300">https://github.com/abuzerexe</span> 
               </li>
               <li className="flex items-center space-x-2">
                 <Mail className="h-4 w-4 text-purple-400" />

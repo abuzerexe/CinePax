@@ -6,7 +6,6 @@ import path from 'path';
 
 import connectDB from './connect';
 
-// Routes
 import authRoutes from './routes/auth.route';
 import customerRoutes from './routes/customer.route';
 import movieRoutes from './routes/movie.route';
@@ -23,13 +22,11 @@ dotenv.config();
 connectDB(process.env.MONGO_URI as string);
 
 const app = express();
-
-// Middleware
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: 'https://cors-test.codehappy.dev', // your allowed origin
-  credentials: true // enable if using cookies or auth headers
+  origin: ["http://localhost:3000"], 
+  credentials: true 
 }));
 
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -38,26 +35,37 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 if (process.env.NODE_ENV === 'development') {
-  // Dev mode root route message
   app.get('/', (req: Request, res: Response) => {
     res.send('Backend server is running!');
   });
 } else {
-  const frontendPath = path.join(__dirname, '../../frontend/dist');
+  const frontendPath = path.join(__dirname, '../frontend/dist');
   console.log('Production mode - Frontend path:', frontendPath);
   
-  // Check if the frontend build exists
+
   if (!require('fs').existsSync(frontendPath)) {
     console.error('Frontend build not found at:', frontendPath);
   }
 
-  // Serve static files from the frontend build directory
-  app.use(express.static(frontendPath));
+
+  app.use(express.static(frontendPath, {
+    setHeaders: (res, path) => {
+      if (path.endsWith('.js')) {
+        res.setHeader('Content-Type', 'application/javascript');
+      } else if (path.endsWith('.css')) {
+        res.setHeader('Content-Type', 'text/css');
+      } else if (path.endsWith('.json')) {
+        res.setHeader('Content-Type', 'application/json');
+      } else if (path.endsWith('.webmanifest')) {
+        res.setHeader('Content-Type', 'application/manifest+json');
+      }
+    }
+  }));
   console.log('Static files being served from:', frontendPath);
 }
 
-// API Routes - these should take precedence over the catch-all route
-app.use('/api/auth', authRoutes);
+
+app.use('/api/', authRoutes);
 app.use('/api/customer', customerRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/movies', movieRoutes);
@@ -69,12 +77,22 @@ app.use('/api/tickets', ticketRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/admin', adminRoutes);
 
-// Catch-all route for frontend - this should be last
-if (process.env.NODE_ENV !== 'development') {
-  app.get('*', (req: Request, res: Response) => {
-    const indexPath = path.join(__dirname, '../../frontend/dist', 'index.html');
+
+if (process.env.NODE_ENV !== 'development') { 
+  app.get('*', (req: Request, res: Response, next: NextFunction) => {
+
+    if (req.path.startsWith('/api/')) {
+      return next();
+    }
+    
+    const indexPath = path.join(__dirname, '../frontend/dist', 'index.html');
     console.log('Serving index.html from:', indexPath);
-    res.sendFile(indexPath);
+    res.sendFile(indexPath, (err) => {
+      if (err) {
+        console.error('Error sending index.html:', err);
+        res.status(500).json({ message: 'Something went wrong!' });
+      }
+    });
   });
 }
 

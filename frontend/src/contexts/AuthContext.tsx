@@ -3,6 +3,7 @@
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
 import { jwtDecode } from "jwt-decode"
+import { auth } from "../services/api"
 
 interface User {
   id: string
@@ -21,24 +22,36 @@ interface AuthContextType {
   isAdmin: () => boolean
   isStaff: () => boolean
   getAssignedTheater: () => string | undefined
+  loading: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const token = localStorage.getItem("token")
-    if (token) {
-      try {
-        const decoded = jwtDecode<User>(token)
-        setUser(decoded)
-      } catch (error) {
-        console.error("Error decoding token:", error)
-        localStorage.removeItem("token")
+    const verifyToken = async () => {
+      const token = localStorage.getItem("token")
+      if (token) {
+        try {
+          const response = await auth.getProfile()
+          const decoded = jwtDecode<User>(token)
+          setUser({
+            ...decoded,
+            ...response.data
+          })
+        } catch (error) {
+          console.error("Error verifying token:", error)
+          localStorage.removeItem("token")
+          setUser(null)
+        }
       }
+      setLoading(false)
     }
+
+    verifyToken()
   }, [])
 
   const login = (token: string, role: string) => {
@@ -73,6 +86,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return user?.theaterId
   }
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      </div>
+    )
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -83,6 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAdmin,
         isStaff,
         getAssignedTheater,
+        loading
       }}
     >
       {children}

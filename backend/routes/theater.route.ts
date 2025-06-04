@@ -11,7 +11,6 @@ import {
 
 const router = express.Router();
 
-// Theater management routes
 router.post('/', verifyToken, isAdmin, addTheater as RequestHandler);
 router.get('/', getAllTheaters as RequestHandler);
 router.get('/:id', getTheaterById as unknown as RequestHandler);

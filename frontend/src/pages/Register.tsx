@@ -9,9 +9,12 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom"
+import useToast from "@/components/ui/use-toast"
+import { auth } from "../services/api"
 
 const Register = () => {
   const navigate = useNavigate()
+  const { toast } = useToast()
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -36,7 +39,6 @@ const Register = () => {
       ...prev,
       [name]: value,
     }))
-    // Clear error when user starts typing
     setErrors((prev) => ({
       ...prev,
       [name]: "",
@@ -101,14 +103,25 @@ const Register = () => {
     setLoading(true)
 
     try {
-      // Mock API call -  replace with actual API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // Mock successful registration
+      const userData = {
+        email: formData.email,
+        password: formData.password,
+        fullName: `${formData.firstName} ${formData.lastName}`,
+        phone: "001" 
+      }
+      await auth.signup(userData)
+      toast({
+        title: "Success",
+        description: "Account created successfully! Please log in.",
+      })
       navigate("/login")
-    } catch (error) {
+    } catch (error: any) {
       console.error("Registration failed:", error)
-      // Handle registration error
+      toast({
+        title: "Registration Failed",
+        description: error.response?.data?.message || "An error occurred during registration",
+        variant: "destructive"
+      })
     } finally {
       setLoading(false)
     }

@@ -117,11 +117,11 @@ const Home = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-purple-600 mb-2">50+</div>
+              <div className="text-3xl md:text-4xl font-bold text-purple-600 mb-2">100+</div>
               <div className="text-muted-foreground">Movies</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-purple-600 mb-2">15</div>
+              <div className="text-3xl md:text-4xl font-bold text-purple-600 mb-2">5</div>
               <div className="text-muted-foreground">Theaters</div>
             </div>
             <div className="text-center">
@@ -129,7 +129,7 @@ const Home = () => {
               <div className="text-muted-foreground">Happy Customers</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-purple-600 mb-2">4.9</div>
+              <div className="text-3xl md:text-4xl font-bold text-purple-600 mb-2">9.8</div>
               <div className="text-muted-foreground flex items-center justify-center">
                 <Star className="w-4 h-4 fill-yellow-400 text-yellow-400 mr-1" />
                 Rating

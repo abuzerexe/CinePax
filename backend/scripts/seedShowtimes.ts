@@ -7,6 +7,7 @@ import Showtime from '../model/showtime.model';
 dotenv.config();
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/Cinepax';
+const THEATER_CAPACITY = 50; // Set fixed capacity to 50 seats
 
 // Helper function to add hours to a date
 const addHours = (date: Date, hours: number) => {
@@ -48,7 +49,7 @@ async function seedShowtimes() {
     await Showtime.deleteMany({});
     console.log('Cleared existing showtimes');
 
-    // Generate showtimes for the next 7 days
+    // Generate showtimes for the next 14 days (2 weeks)
     const showtimes = [];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -58,7 +59,7 @@ async function seedShowtimes() {
     const afternoonSlots = [13, 15, 17];
     const eveningSlots = [19, 20, 21];
 
-    for (let day = 0; day < 7; day++) {
+    for (let day = 0; day < 14; day++) {
       const currentDate = addHours(today, day * 24);
       
       // For each theater
@@ -89,7 +90,7 @@ async function seedShowtimes() {
               startTime,
               endTime,
               price,
-              availableSeats: theater.capacity
+              availableSeats: THEATER_CAPACITY // Use the fixed capacity
             });
           }
         }

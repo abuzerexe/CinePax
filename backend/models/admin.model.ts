@@ -32,7 +32,6 @@ const adminSchema = new Schema<IAdmin>({
   timestamps: true,
 });
 
-// Hash password before saving
 adminSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
   
@@ -45,12 +44,10 @@ adminSchema.pre('save', async function(next) {
   }
 });
 
-// Method to check password
 adminSchema.methods.isPasswordCorrect = async function(password: string): Promise<boolean> {
   return bcrypt.compare(password, this.password);
 };
 
-// Check if model exists before creating a new one
 const Admin = mongoose.models.Admin || mongoose.model<IAdmin>('Admin', adminSchema);
 
 export default Admin; 

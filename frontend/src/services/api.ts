@@ -9,7 +9,6 @@ const api = axios.create({
   }
 })
 
-// Add token to requests if it exists
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token")
   if (token) {
@@ -34,7 +33,7 @@ export const auth = {
   },
   logout: async () => {
     const response = await api.post("/logout")
-    return response.data``
+    return response.data
   },
   updateProfile: async (userData: {
     fullName: string
@@ -64,8 +63,8 @@ export const theaters = {
     return response.data
   },
   getShowtime: async (showtimeId: string) => {
-    const response = await api.get(`/user/showtimes/${showtimeId}`)
-    return response.data
+    const response = await axios.get(`${API_URL}/user/showtimes/${showtimeId}`);
+    return response.data;
   },
   create: async (theaterData: any) => {
     const response = await api.post("/theaters", theaterData)
@@ -82,30 +81,44 @@ export const theaters = {
 }
 
 export const movies = {
-  getAll: async () => {
-    const response = await api.get("/movies")
-    return response.data
+  getAll: async (params?: { 
+    page?: number; 
+    limit?: number; 
+    search?: string;
+    genre?: string;
+    year?: string;
+    sortBy?: string;
+  }) => {
+    const queryParams = new URLSearchParams();
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.search) queryParams.append('search', params.search);
+    if (params?.genre && params.genre !== 'all') queryParams.append('genre', params.genre);
+    if (params?.year && params.year !== 'all') queryParams.append('year', params.year);
+    if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
+
+    const response = await api.get(`/movies?${queryParams.toString()}`);
+    return response.data;
   },
   getById: async (id: string) => {
-    const response = await api.get(`/movies/${id}`)
-    return response.data
+    const response = await api.get(`/movies/${id}`);
+    return response.data;
   },
   getFeatured: async () => {
-    const response = await api.get("/movies/featured")
-    console.log(response)
-    return response.data
+    const response = await api.get("/movies/featured");
+    return response.data;
   },
   create: async (movieData: any) => {
-    const response = await api.post("/movies", movieData)
-    return response.data
+    const response = await api.post("/movies", movieData);
+    return response.data;
   },
   update: async (id: string, movieData: any) => {
-    const response = await api.put(`/movies/${id}`, movieData)
-    return response.data
+    const response = await api.put(`/movies/${id}`, movieData);
+    return response.data;
   },
   delete: async (id: string) => {
-    const response = await api.delete(`/movies/${id}`)
-    return response.data
+    const response = await api.delete(`/movies/${id}`);
+    return response.data;
   },
 }
 
@@ -143,19 +156,55 @@ export const tickets = {
   },
   getUserBookings: async () => {
     const response = await api.get(`/user/bookings`)
-    return response.data
+    const bookings = response.data.data.map((booking: any) => ({
+      bookingId: booking._id,
+      movie: {
+        title: booking.movie.title,
+        duration: booking.movie.duration,
+        genre: booking.movie.genre,
+        posterUrl: booking.movie.image
+      },
+      theater: {
+        name: booking.showtime.theater,
+        location: booking.showtime.location
+      },
+      showtime: {
+        startTime: booking.showtime.startTime,
+        endTime: booking.showtime.endTime
+      },
+      seats: booking.seats.map((seat: any) => ({
+        row: seat.row || seat.charAt?.(0) || '',
+        seatNumber: seat.seatNumber || seat.slice?.(1) || ''
+      })),
+      price: booking.totalAmount,
+      bookingDate: booking.createdAt,
+      status: booking.status
+    }))
+    return { data: bookings }
+  },
+  getBookedSeats: async (showtimeId: string) => {
+    const response = await api.get(`/user/showtimes/${showtimeId}`);
+    const bookedSeats = response.data.data.bookedSeatsList || [];
+    return {
+      data: {
+        bookedSeats: bookedSeats.map((seat: { seatId: string; name: string }) => ({
+          id: seat.seatId,
+          name: seat.name
+        }))
+      }
+    };
   },
   create: async (bookingData: {
     showtimeId: string;
     seats: string[];
     totalAmount: number;
   }) => {
-    // Transform the data to match backend expectations
-    const seat = bookingData.seats[0]; // For now, we'll send the first seat
+  
+    const seat = bookingData.seats[0]; 
     const requestData = {
       showtimeId: bookingData.showtimeId,
-      seatNumber: seat.slice(1), // Get the number part (e.g., "8" from "A8")
-      row: seat.charAt(0) // Get the row letter (e.g., "A" from "A8")
+      seatNumber: seat.slice(1), 
+      row: seat.charAt(0) 
     }
     const response = await api.post("/user/book", requestData)
     return response.data
@@ -164,7 +213,7 @@ export const tickets = {
     status?: 'pending' | 'confirmed' | 'cancelled';
     paymentStatus?: 'pending' | 'paid' | 'failed' | 'refunded';
   }) => {
-    const response = await api.put(`/tickets/${id}/status`, bookingData)
+    const response = await api.put(`/user/bookings/${id}/status`, { status: bookingData.status })
     return response.data
   },
   delete: async (id: string) => {

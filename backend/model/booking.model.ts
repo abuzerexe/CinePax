@@ -7,6 +7,8 @@ export interface IBooking extends Document {
   totalAmount: number;
   status: 'pending' | 'confirmed' | 'cancelled';
   paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
+  ticket: mongoose.Types.ObjectId;
+  payment: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -41,6 +43,16 @@ const BookingSchema = new Schema({
     type: String,
     enum: ['pending', 'paid', 'failed', 'refunded'],
     default: 'pending'
+  },
+  ticket: {
+    type: Schema.Types.ObjectId,
+    ref: 'Ticket',
+    required: true
+  },
+  payment: {
+    type: Schema.Types.ObjectId,
+    ref: 'Payment',
+    required: true
   }
 }, {
   timestamps: true

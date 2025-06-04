@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import Seat from '../model/seat.model';
 import Showtime from '../model/showtime.model';
 
-// Add new seat
 export const addSeat = async (req: Request, res: Response) => {
   try {
     const { showtimeId, seatNumber } = req.body;
@@ -11,13 +10,11 @@ export const addSeat = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    // Check if showtime exists
     const showtime = await Showtime.findById(showtimeId);
     if (!showtime) {
       return res.status(404).json({ message: 'Showtime not found' });
     }
 
-    // Check if seat already exists for this showtime
     const existingSeat = await Seat.findOne({
       showtimeId,
       seatNumber
@@ -42,7 +39,6 @@ export const addSeat = async (req: Request, res: Response) => {
   }
 };
 
-// Get all seats
 export const getAllSeats = async (req: Request, res: Response) => {
   try {
     const seats = await Seat.find().populate('showtimeId', 'movieId theaterId startTime');
@@ -57,7 +53,6 @@ export const getAllSeats = async (req: Request, res: Response) => {
   }
 };
 
-// Get seats by showtime
 export const getSeatsByShowtime = async (req: Request, res: Response) => {
   try {
     const { showtimeId } = req.params;
@@ -74,7 +69,6 @@ export const getSeatsByShowtime = async (req: Request, res: Response) => {
   }
 };
 
-// Delete seat
 export const deleteSeat = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -84,7 +78,6 @@ export const deleteSeat = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Seat not found' });
     }
 
-    // Delete the seat
     await Seat.findByIdAndDelete(id);
 
     res.status(200).json({

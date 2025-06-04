@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import Customer, { ICustomer } from '../models/customer.model';
 import Admin, { IAdmin } from '../models/admin.model';
 
-// Get all users (both customers and admins)
 export const getAllUsers = async (req: Request, res: Response) => {
     try {
         const customers = await Customer.find().select('-password');
@@ -27,12 +26,10 @@ export const getAllUsers = async (req: Request, res: Response) => {
     }
 };
 
-// Get user by ID
 export const getUserById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         
-        // Try to find in customers first
         const customer = await Customer.findById(id).select('-password');
         if (customer) {
             const customerObj = customer.toObject();
@@ -42,7 +39,6 @@ export const getUserById = async (req: Request, res: Response) => {
             });
         }
 
-        // If not found in customers, try admins
         const admin = await Admin.findById(id).select('-password');
         if (admin) {
             const adminObj = admin.toObject();
@@ -66,12 +62,10 @@ export const getUserById = async (req: Request, res: Response) => {
     }
 };
 
-// Create new user
 export const createUser = async (req: Request, res: Response) => {
     try {
         const { email, password, fullName, role, phone } = req.body;
 
-        // Check if user already exists
         const existingCustomer = await Customer.findOne({ email });
         const existingAdmin = await Admin.findOne({ email });
         
@@ -116,13 +110,11 @@ export const createUser = async (req: Request, res: Response) => {
     }
 };
 
-// Update user
 export const updateUser = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const { fullName, email, phone, role } = req.body;
 
-        // Try to find and update in customers first
         const customer = await Customer.findById(id);
         if (customer) {
             customer.fullName = fullName || customer.fullName;
@@ -139,7 +131,6 @@ export const updateUser = async (req: Request, res: Response) => {
             });
         }
 
-        // If not found in customers, try admins
         const admin = await Admin.findById(id);
         if (admin) {
             admin.fullName = fullName || admin.fullName;
@@ -170,12 +161,10 @@ export const updateUser = async (req: Request, res: Response) => {
     }
 };
 
-// Delete user
 export const deleteUser = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
 
-        // Try to delete from customers first
         const deletedCustomer = await Customer.findByIdAndDelete(id);
         if (deletedCustomer) {
             return res.status(200).json({
@@ -184,7 +173,6 @@ export const deleteUser = async (req: Request, res: Response) => {
             });
         }
 
-        // If not found in customers, try admins
         const deletedAdmin = await Admin.findByIdAndDelete(id);
         if (deletedAdmin) {
             return res.status(200).json({

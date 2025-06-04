@@ -10,7 +10,6 @@ import {
 
 const router = express.Router();
 
-// Admin user management routes
 router.get('/users', verifyToken, isAdmin, getAllUsers as RequestHandler);
 router.get('/users/:id', verifyToken, isAdmin, getUserById as RequestHandler);
 router.post('/users', verifyToken, isAdmin, createUser as RequestHandler);

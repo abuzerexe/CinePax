@@ -52,7 +52,6 @@ interface TheaterStats {
   availableSeats: number;
 }
 
-// Get all booked tickets (admin only)
 export const getAllBookedTickets = async (req: Request, res: Response) => {
   try {
     const tickets = (await Ticket.find()
@@ -67,7 +66,6 @@ export const getAllBookedTickets = async (req: Request, res: Response) => {
       .populate('seat', 'seatNumber row')
       .lean()) as unknown as PopulatedTicket[];
 
-    // Calculate available seats for each theater
     const theaterStats: Record<string, TheaterStats> = {};
     tickets.forEach(ticket => {
       const showtime = ticket.showtime;
@@ -112,12 +110,10 @@ export const getAllBookedTickets = async (req: Request, res: Response) => {
   }
 };
 
-// Get booked tickets by showtime (admin only)
 export const getBookedTicketsByShowtime = async (req: Request<{ showtimeId: string }>, res: Response) => {
   try {
     const { showtimeId } = req.params;
 
-    // Check if showtime exists
     const showtime = await Showtime.findById(showtimeId);
     if (!showtime) {
       return res.status(404).json({ message: 'Showtime not found' });
@@ -127,7 +123,6 @@ export const getBookedTicketsByShowtime = async (req: Request<{ showtimeId: stri
       .populate('customer', 'fullName email phone')
       .populate('seat', 'seatNumber row');
 
-    // Get theater capacity
     const theater = await Theater.findById(showtime.theaterId);
     if (!theater) {
       return res.status(404).json({ message: 'Theater not found' });
@@ -158,7 +153,6 @@ export const getBookedTicketsByShowtime = async (req: Request<{ showtimeId: stri
   }
 };
 
-// Update ticket status (admin only)
 export const updateTicketStatus = async (req: Request<{ ticketId: string }>, res: Response) => {
   try {
     const { ticketId } = req.params;
@@ -171,9 +165,18 @@ export const updateTicketStatus = async (req: Request<{ ticketId: string }>, res
     const ticket = await Ticket.findById(ticketId)
       .populate({
         path: 'showtime',
+        select: 'movieId theaterId startTime endTime price',
         populate: [
-          { path: 'movie', select: 'title duration genre' },
-          { path: 'theater', select: 'name location capacity' }
+          { 
+            path: 'movieId',
+            select: 'title duration genre',
+            model: 'Movie'
+          },
+          { 
+            path: 'theaterId',
+            select: 'name location capacity',
+            model: 'Theater'
+          }
         ]
       })
       .populate('customer', 'fullName email phone')
@@ -183,8 +186,7 @@ export const updateTicketStatus = async (req: Request<{ ticketId: string }>, res
       return res.status(404).json({ message: 'Ticket not found' });
     }
 
-    // Check if showtime is in the past
-    const showtime = await Showtime.findById(ticket.showtime);
+    const showtime = await Showtime.findById(ticket.showtime._id);
     if (!showtime) {
       return res.status(404).json({ message: 'Showtime not found' });
     }
@@ -192,21 +194,42 @@ export const updateTicketStatus = async (req: Request<{ ticketId: string }>, res
     const showtimeDate = new Date(showtime.startTime);
     const currentDate = new Date();
 
-    // Don't allow status changes for past showtimes
     if (showtimeDate < currentDate) {
       return res.status(400).json({ message: 'Cannot update status for past showtimes' });
     }
 
-    // Update ticket status
     ticket.status = status;
     await ticket.save();
 
+    const populatedTicket = ticket as unknown as PopulatedTicket;
+    const transformedTicket = {
+      _id: populatedTicket._id,
+      customer: populatedTicket.customer,
+      showtime: {
+        _id: populatedTicket.showtime._id,
+        movie: populatedTicket.showtime.movieId,
+        theater: populatedTicket.showtime.theaterId,
+        startTime: populatedTicket.showtime.startTime,
+        endTime: populatedTicket.showtime.endTime,
+        price: populatedTicket.showtime.price
+      },
+      seat: populatedTicket.seat,
+      price: populatedTicket.price,
+      status: populatedTicket.status,
+      createdAt: populatedTicket.createdAt
+    };
+
     res.status(200).json({
       success: true,
-      data: ticket
+      data: transformedTicket
     });
   } catch (err: any) {
-    res.status(500).json({ message: 'Server error', error: err.message });
+    console.error('Error updating ticket status:', err);
+    res.status(500).json({ 
+      message: 'Server error', 
+      error: err.message,
+      details: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
   }
 };
 

@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import Staff from '../model/staff.model';
 import Theater from '../model/theater.model';
 
-// Add new staff
 export const addStaff = async (req: Request, res: Response): Promise<void> => {
   try {
     const { theater, firstName, lastName, role } = req.body;
@@ -12,7 +11,6 @@ export const addStaff = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Check if theater exists
     const theaterExists = await Theater.findById(theater);
     if (!theaterExists) {
       res.status(404).json({ message: 'Theater not found' });
@@ -35,7 +33,6 @@ export const addStaff = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Get all staff
 export const getAllStaff = async (req: Request, res: Response): Promise<void> => {
   try {
     const staff = await Staff.find().lean();
@@ -49,7 +46,6 @@ export const getAllStaff = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-// Delete staff
 export const deleteStaff = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
   try {
     const staff = await Staff.findByIdAndDelete(req.params.id);

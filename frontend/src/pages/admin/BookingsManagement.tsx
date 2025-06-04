@@ -62,35 +62,36 @@ const BookingsManagement = () => {
     try {
       setLoading(true)
       const response = await tickets.getAll()
-      // Map backend data to frontend structure
-      const mapped = response.data.map((b: any) => ({
-        _id: b._id,
-        userId: {
-          _id: b.customer._id,
-          fullName: b.customer.fullName,
-          email: b.customer.email,
-        },
-        showtimeId: {
-          _id: b.showtime._id,
-          startTime: b.showtime.startTime,
-          endTime: b.showtime.endTime,
-          movieId: {
-            _id: b.showtime.movie._id,
-            title: b.showtime.movie.title,
+      const mapped = response.data.map((b: any) => {
+        return {
+          _id: b._id,
+          userId: {
+            _id: b.customer?._id || 'N/A',
+            fullName: b.customer?.fullName || 'N/A',
+            email: b.customer?.email || 'N/A',
           },
-          theaterId: {
-            _id: b.showtime.theater._id,
-            name: b.showtime.theater.name,
-            location: b.showtime.theater.location,
+          showtimeId: {
+            _id: b.showtime?._id || 'N/A',
+            startTime: b.showtime?.startTime || new Date().toISOString(),
+            endTime: b.showtime?.endTime || new Date().toISOString(),
+            movieId: {
+              _id: b.showtime?.movie?._id || 'N/A',
+              title: b.showtime?.movie?.title || 'N/A',
+            },
+            theaterId: {
+              _id: b.showtime?.theater?._id || 'N/A',
+              name: b.showtime?.theater?.name || 'N/A',
+              location: b.showtime?.theater?.location || 'N/A',
+            },
           },
-        },
-        seats: [b.seat.seatNumber], // Convert to array
-        totalAmount: b.price,
-        status: b.status,
-        paymentStatus: b.paymentStatus || "paid", // fallback if not present
-        createdAt: b.createdAt,
-        updatedAt: b.updatedAt || b.createdAt,
-      }))
+          seats: b.seat ? [`${b.seat.row}${b.seat.seatNumber}`] : ['N/A'],
+          totalAmount: b.price || 0,
+          status: b.status || 'pending',
+          paymentStatus: b.paymentStatus || 'pending',
+          createdAt: b.createdAt || new Date().toISOString(),
+          updatedAt: b.updatedAt || b.createdAt || new Date().toISOString(),
+        }
+      })
       setBookings(mapped)
     } catch (error) {
       console.error("Error fetching bookings:", error)
@@ -104,10 +105,7 @@ const BookingsManagement = () => {
     }
   }
 
-  // const handleOpenDialog = (booking: Booking) => {
-  //   setSelectedBooking(booking)
-  //   setOpenDialog(true)
-  // }
+
 
   const handleCloseDialog = () => {
     setOpenDialog(false)
@@ -116,17 +114,21 @@ const BookingsManagement = () => {
 
   const handleStatusUpdate = async (bookingId: string, newStatus: 'pending' | 'confirmed' | 'cancelled') => {
     try {
-      await tickets.update(bookingId, { status: newStatus })
-      toast({
-        title: "Success",
-        description: "Booking status updated successfully.",
-      })
-      fetchBookings() // Refresh the list
-    } catch (error) {
+      const response = await tickets.update(bookingId, { status: newStatus })
+      if (response.success) {
+        toast({
+          title: "Success",
+          description: response.message || "Booking status updated successfully.",
+        })
+        fetchBookings() 
+      } else {
+        throw new Error(response.message || "Failed to update booking status")
+      }
+    } catch (error: any) {
       console.error("Error updating booking status:", error)
       toast({
         title: "Error",
-        description: "Failed to update booking status. Please try again.",
+        description: error.response?.data?.message || error.message || "Failed to update booking status. Please try again.",
         variant: "destructive"
       })
     }
@@ -146,7 +148,6 @@ const BookingsManagement = () => {
   }
 
   const filteredBookings = bookings.filter((booking) => {
-    console.log(booking)
     const matchesSearch =
       booking.userId.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       booking.userId.email.toLowerCase().includes(searchTerm.toLowerCase()) ||

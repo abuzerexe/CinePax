@@ -15,7 +15,7 @@ interface PopulatedMovie {
   _id: Types.ObjectId;
   title: string;
   duration: string;
-  posterUrl: string;
+  image: string;
   genre: string;
   rating: number;
 }
@@ -29,7 +29,6 @@ interface PopulatedShowtime {
   availableSeats: number;
 }
 
-// Add new theater
 export const addTheater = async (req: Request<{}, {}, TheaterRequest>, res: Response) => {
   try {
     const { name, location, capacity } = req.body;
@@ -53,7 +52,6 @@ export const addTheater = async (req: Request<{}, {}, TheaterRequest>, res: Resp
   }
 };
 
-// Get all theaters
 export const getAllTheaters = async (req: Request, res: Response) => {
   try {
     const theaters = await Theater.find();
@@ -67,7 +65,6 @@ export const getAllTheaters = async (req: Request, res: Response) => {
   }
 };
 
-// Get theater by ID
 export const getTheaterById = async (req: Request<{ id: string }>, res: Response) => {
   try {
     const { id } = req.params;
@@ -86,7 +83,6 @@ export const getTheaterById = async (req: Request<{ id: string }>, res: Response
   }
 };
 
-// Get showtimes for a theater
 export const getTheaterShowtimes = async (req: Request<{ id: string }>, res: Response) => {
   try {
     const { id } = req.params;
@@ -100,21 +96,17 @@ export const getTheaterShowtimes = async (req: Request<{ id: string }>, res: Res
       return res.status(404).json({ message: 'Theater not found' });
     }
 
-    // Get total count for pagination
     const totalShowtimes = await Showtime.countDocuments({ theaterId: id });
 
-    console.log('Fetching showtimes for theater:', id);
-    console.log('Total showtimes found:', totalShowtimes);
 
     const showtimes = (await Showtime.find({ theaterId: id })
       .select('startTime endTime price availableSeats movieId')
-      .populate('movieId', 'title duration posterUrl genre rating')
+      .populate('movieId', 'title duration image genre rating')
       .sort({ startTime: 1 })
       .skip(skip)
       .limit(limit)
       .lean()) as unknown as PopulatedShowtime[];
 
-    console.log('Retrieved showtimes:', showtimes.length);
 
     res.status(200).json({
       success: true,
@@ -137,7 +129,6 @@ export const getTheaterShowtimes = async (req: Request<{ id: string }>, res: Res
   }
 };
 
-// Delete theater
 export const deleteTheater = async (req: Request<{ id: string }>, res: Response) => {
   try {
     const { id } = req.params;
@@ -157,7 +148,6 @@ export const deleteTheater = async (req: Request<{ id: string }>, res: Response)
   }
 };
 
-// Update theater
 export const updateTheater = async (req: Request<{ id: string }, {}, TheaterRequest>, res: Response) => {
   try {
     const { id } = req.params;

@@ -108,7 +108,6 @@ const MovieDetails = () => {
     if (showtimeId) {
       navigate(`/booking/${showtimeId}`)
     } else {
-      // If no showtime is selected, show the showtimes section
       const showtimesSection = document.getElementById("showtimes-section")
       if (showtimesSection) {
         showtimesSection.scrollIntoView({ behavior: "smooth" })
@@ -123,7 +122,7 @@ const MovieDetails = () => {
           {/* Movie Poster */}
           <div className="lg:col-span-1">
             <div className="sticky top-8">
-              <img src={movie.image || "/placeholder.svg"} alt={movie.title} className="w-full rounded-lg shadow-2xl" />
+              <img src={movie.image || "https://placehold.co/600x900/e2e8f0/cbd5e1?text=Movie"} alt={movie.title} className="w-full rounded-lg shadow-2xl" />
             </div>
           </div>
 
@@ -169,9 +168,6 @@ const MovieDetails = () => {
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" onClick={() => handleBookTicket()} className="flex-1">
                 Book Tickets
-              </Button>
-              <Button size="lg" variant="outline" className="flex-1">
-                Add to Watchlist
               </Button>
             </div>
           </div>

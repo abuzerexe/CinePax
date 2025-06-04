@@ -95,8 +95,8 @@ export default function Navigation() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src="/placeholder.svg" alt="User" />
-                      <AvatarFallback>{user.email[0].toUpperCase()}</AvatarFallback>
+                      <AvatarImage src="https://avatars.githubusercontent.com/u/140898970?s=400&u=37fd7bdf61f2773df44e33db071c1a4c4bc1604f&v=4" alt="User" />
+                      <AvatarFallback>{user.fullName ? user.fullName[0].toUpperCase() : user.email[0].toUpperCase()}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
@@ -135,9 +135,9 @@ export default function Navigation() {
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-                <nav className="flex flex-col space-y-4">
-                  <Link to="/" className="flex items-center space-x-2 mb-4">
+              <SheetContent side="right" className="w-[300px] sm:w-[400px] pt-4">
+                <nav className="flex flex-col ml-2 mr-2">
+                  <Link to="/" className="flex items-center space-x-2 mb-3">
                     <Film className="h-6 w-6 text-purple-600" />
                     <span className="text-xl font-bold">CinePax</span>
                   </Link>
@@ -146,7 +146,7 @@ export default function Navigation() {
                     <Link
                       key={item.name}
                       to={item.href}
-                      className="flex items-center space-x-2 text-lg font-medium"
+                      className="flex items-center space-x-2 text-lg font-medium py-2"
                       onClick={() => setIsOpen(false)}
                     >
                       <item.icon className="h-5 w-5" />
@@ -156,13 +156,13 @@ export default function Navigation() {
 
                   {(isAdmin() || isStaff()) && (
                     <>
-                      <div className="border-t pt-4">
-                        <p className="text-sm font-medium text-muted-foreground mb-2">Admin</p>
+                      <div className="border-t my-2">
+                        <p className="text-sm font-medium text-muted-foreground py-2">Admin</p>
                         {adminItems.map((item) => (
                           <Link
                             key={item.name}
                             to={item.href}
-                            className="flex items-center space-x-2 text-lg font-medium mb-2"
+                            className="flex items-center space-x-2 text-lg font-medium py-2"
                             onClick={() => setIsOpen(false)}
                           >
                             <item.icon className="h-5 w-5" />
@@ -174,8 +174,8 @@ export default function Navigation() {
                   )}
 
                   {/* Dark Mode Toggle in Mobile Menu */}
-                  <div className="border-t pt-4">
-                    <Button variant="ghost" onClick={toggleDarkMode} className="w-full justify-start">
+                  <div className="border-t my-2">
+                    <Button variant="ghost" onClick={toggleDarkMode} className="w-full justify-start py-2">
                       {darkMode ? (
                         <>
                           <Sun className="mr-2 h-4 w-4" />
@@ -191,7 +191,7 @@ export default function Navigation() {
                   </div>
 
                   {!user && (
-                    <div className="flex flex-col space-y-2 pt-4">
+                    <div className="flex flex-col space-y-2 border-t my-2">
                       <Button variant="outline" asChild>
                         <Link to="/login" onClick={() => setIsOpen(false)}>
                           Sign In

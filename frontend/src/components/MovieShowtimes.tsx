@@ -3,7 +3,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
-import { MapPin, Users, DollarSign, ChevronLeft, ChevronRight } from "lucide-react"
+import { MapPin, Users, ChevronLeft, ChevronRight } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
 
@@ -82,8 +82,7 @@ const MovieShowtimes = ({ movieId, showtimes }: MovieShowtimesProps) => {
                   {showtime.availableSeats} seats available
                 </div>
                 <div className="flex items-center font-semibold">
-                  <DollarSign className="w-4 h-4 mr-1" />
-                  ${showtime.price.toFixed(2)}
+                  Rs. {showtime.price.toFixed(2)}
                 </div>
               </div>
 

@@ -4,7 +4,7 @@
       "_id": "65f1a1b2c3d4e5f6a7b8c9d0",
       "name": "CinePax IMAX",
       "location": "Gulberg, Lahore",
-      "capacity": 300,
+      "capacity": 50,
       "screens": 1,
       "amenities": ["IMAX", "Dolby Atmos", "Premium Seating"],
       "createdAt": "2024-03-13T10:00:00.000Z",
@@ -14,7 +14,7 @@
       "_id": "65f1a1b2c3d4e5f6a7b8c9d1",
       "name": "CinePax Premium",
       "location": "DHA, Lahore",
-      "capacity": 250,
+      "capacity": 50,
       "screens": 2,
       "amenities": ["Dolby Atmos", "Premium Seating", "Food Court"],
       "createdAt": "2024-03-13T10:00:00.000Z",
@@ -24,7 +24,7 @@
       "_id": "65f1a1b2c3d4e5f6a7b8c9d2",
       "name": "CinePax Family",
       "location": "Johar Town, Lahore",
-      "capacity": 200,
+      "capacity": 50,
       "screens": 3,
       "amenities": ["3D", "Family Seating", "Play Area"],
       "createdAt": "2024-03-13T10:00:00.000Z",
@@ -34,7 +34,7 @@
       "_id": "65f1a1b2c3d4e5f6a7b8c9d3",
       "name": "CinePax Express",
       "location": "Model Town, Lahore",
-      "capacity": 180,
+      "capacity": 50,
       "screens": 2,
       "amenities": ["Standard Seating", "Snack Bar"],
       "createdAt": "2024-03-13T10:00:00.000Z",
@@ -44,7 +44,7 @@
       "_id": "65f1a1b2c3d4e5f6a7b8c9d4",
       "name": "CinePax Gold",
       "location": "Bahria Town, Lahore",
-      "capacity": 220,
+      "capacity": 50,
       "screens": 2,
       "amenities": ["Gold Class", "Premium Dining", "VIP Lounge"],
       "createdAt": "2024-03-13T10:00:00.000Z",
@@ -59,7 +59,7 @@
       "startTime": "2024-03-15T10:00:00.000Z",
       "endTime": "2024-03-15T11:12:00.000Z",
       "price": 1200,
-      "availableSeats": 300,
+      "availableSeats": 49,
       "createdAt": "2024-03-13T10:00:00.000Z",
       "updatedAt": "2024-03-13T10:00:00.000Z"
     },
@@ -70,7 +70,7 @@
       "startTime": "2024-03-15T13:00:00.000Z",
       "endTime": "2024-03-15T14:12:00.000Z",
       "price": 1000,
-      "availableSeats": 250,
+      "availableSeats": 50,
       "createdAt": "2024-03-13T10:00:00.000Z",
       "updatedAt": "2024-03-13T10:00:00.000Z"
     },
@@ -81,7 +81,7 @@
       "startTime": "2024-03-15T15:00:00.000Z",
       "endTime": "2024-03-15T16:57:00.000Z",
       "price": 900,
-      "availableSeats": 200,
+      "availableSeats": 50,
       "createdAt": "2024-03-13T10:00:00.000Z",
       "updatedAt": "2024-03-13T10:00:00.000Z"
     },
@@ -92,7 +92,7 @@
       "startTime": "2024-03-15T18:00:00.000Z",
       "endTime": "2024-03-15T19:28:00.000Z",
       "price": 800,
-      "availableSeats": 180,
+      "availableSeats": 50,
       "createdAt": "2024-03-13T10:00:00.000Z",
       "updatedAt": "2024-03-13T10:00:00.000Z"
     },
@@ -103,7 +103,7 @@
       "startTime": "2024-03-15T20:00:00.000Z",
       "endTime": "2024-03-15T20:14:00.000Z",
       "price": 1500,
-      "availableSeats": 220,
+      "availableSeats": 50,
       "createdAt": "2024-03-13T10:00:00.000Z",
       "updatedAt": "2024-03-13T10:00:00.000Z"
     }
@@ -124,6 +124,95 @@
       "status": "booked",
       "createdAt": "2024-03-13T10:00:00.000Z",
       "updatedAt": "2024-03-13T10:00:00.000Z"
+    },
+    {
+      "_id": "65f1a1b2c3d4e5f6a7b8c9f6",
+      "showtimeId": "65f1a1b2c3d4e5f6a7b8c9e0",
+      "seatNumber": "A3",
+      "status": "available",
+      "createdAt": "2024-03-13T10:00:00.000Z",
+      "updatedAt": "2024-03-13T10:00:00.000Z"
+    },
+    {
+      "_id": "65f1a1b2c3d4e5f6a7b8c9f7",
+      "showtimeId": "65f1a1b2c3d4e5f6a7b8c9e0",
+      "seatNumber": "A4",
+      "status": "available",
+      "createdAt": "2024-03-13T10:00:00.000Z",
+      "updatedAt": "2024-03-13T10:00:00.000Z"
+    },
+    {
+      "_id": "65f1a1b2c3d4e5f6a7b8c9f8",
+      "showtimeId": "65f1a1b2c3d4e5f6a7b8c9e0",
+      "seatNumber": "A5",
+      "status": "available",
+      "createdAt": "2024-03-13T10:00:00.000Z",
+      "updatedAt": "2024-03-13T10:00:00.000Z"
+    },
+    {
+      "_id": "65f1a1b2c3d4e5f6a7b8c9f9",
+      "showtimeId": "65f1a1b2c3d4e5f6a7b8c9e0",
+      "seatNumber": "B1",
+      "status": "available",
+      "createdAt": "2024-03-13T10:00:00.000Z",
+      "updatedAt": "2024-03-13T10:00:00.000Z"
+    },
+    {
+      "_id": "65f1a1b2c3d4e5f6a7b8c9fa",
+      "showtimeId": "65f1a1b2c3d4e5f6a7b8c9e0",
+      "seatNumber": "B2",
+      "status": "available",
+      "createdAt": "2024-03-13T10:00:00.000Z",
+      "updatedAt": "2024-03-13T10:00:00.000Z"
+    },
+    {
+      "_id": "65f1a1b2c3d4e5f6a7b8c9fb",
+      "showtimeId": "65f1a1b2c3d4e5f6a7b8c9e0",
+      "seatNumber": "B3",
+      "status": "available",
+      "createdAt": "2024-03-13T10:00:00.000Z",
+      "updatedAt": "2024-03-13T10:00:00.000Z"
+    },
+    {
+      "_id": "65f1a1b2c3d4e5f6a7b8c9fc",
+      "showtimeId": "65f1a1b2c3d4e5f6a7b8c9e0",
+      "seatNumber": "B4",
+      "status": "available",
+      "createdAt": "2024-03-13T10:00:00.000Z",
+      "updatedAt": "2024-03-13T10:00:00.000Z"
+    },
+    {
+      "_id": "65f1a1b2c3d4e5f6a7b8c9fd",
+      "showtimeId": "65f1a1b2c3d4e5f6a7b8c9e0",
+      "seatNumber": "B5",
+      "status": "available",
+      "createdAt": "2024-03-13T10:00:00.000Z",
+      "updatedAt": "2024-03-13T10:00:00.000Z"
+    }
+  ],
+  "tickets": [
+    {
+      "_id": "65f1a1b2c3d4e5f6a7b8c9f4",
+      "showtime": "65f1a1b2c3d4e5f6a7b8c9e0",
+      "customer": "65f1a1b2c3d4e5f6a7b8c9f3",
+      "seat": "65f1a1b2c3d4e5f6a7b8c9f1",
+      "price": 1200,
+      "status": "confirmed",
+      "purchaseDate": "2024-03-13T10:00:00.000Z",
+      "createdAt": "2024-03-13T10:00:00.000Z",
+      "updatedAt": "2024-03-13T10:00:00.000Z"
+    }
+  ],
+  "payments": [
+    {
+      "_id": "65f1a1b2c3d4e5f6a7b8c9f5",
+      "ticket": "65f1a1b2c3d4e5f6a7b8c9f4",
+      "amount": 1200,
+      "paymentMethod": "ONLINE",
+      "paymentStatus": "COMPLETED",
+      "paymentDate": "2024-03-13T10:00:00.000Z",
+      "createdAt": "2024-03-13T10:00:00.000Z",
+      "updatedAt": "2024-03-13T10:00:00.000Z"
     }
   ],
   "bookings": [
@@ -135,6 +224,8 @@
       "totalAmount": 1200,
       "status": "confirmed",
       "paymentStatus": "paid",
+      "ticket": "65f1a1b2c3d4e5f6a7b8c9f4",
+      "payment": "65f1a1b2c3d4e5f6a7b8c9f5",
       "createdAt": "2024-03-13T10:00:00.000Z",
       "updatedAt": "2024-03-13T10:00:00.000Z"
     }

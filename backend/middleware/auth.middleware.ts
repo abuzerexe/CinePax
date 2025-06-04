@@ -17,7 +17,6 @@ declare global {
   }
 }
 
-// Middleware to verify access token
 export const verifyToken = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const authHeader = req.headers.authorization;
@@ -28,7 +27,6 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
 
     const token = authHeader.split(' ')[1];
 
-    // Check if token is blacklisted
     const isBlacklisted = await Blacklist.findOne({ token });
     if (isBlacklisted) {
       res.status(401).json({ message: 'Token is no longer valid' });
@@ -43,7 +41,6 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
-// Middleware to check if user is admin
 export const isAdmin = (req: Request, res: Response, next: NextFunction): void => {
   if (req.user?.role !== 'admin') {
     res.status(403).json({ message: 'Access denied. Admin only.' });

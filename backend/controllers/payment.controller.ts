@@ -19,7 +19,6 @@ interface PopulatedPayment extends Document {
   paymentStatus: PaymentStatus;
 }
 
-// Get all payments (admin only)
 export const getAllPayments = async (req: Request, res: Response): Promise<void> => {
   try {
     const payments = await Payment.find()
@@ -38,7 +37,6 @@ export const getAllPayments = async (req: Request, res: Response): Promise<void>
         ]
       }) as PopulatedPayment[];
 
-    // Calculate payment statistics
     const stats: PaymentStats = {
       total: payments.length,
       totalAmount: 0,
@@ -54,7 +52,6 @@ export const getAllPayments = async (req: Request, res: Response): Promise<void>
       }
     };
 
-    // Process each payment
     payments.forEach((payment) => {
       const amount = payment.ticket.price;
       stats.totalAmount += amount;
@@ -77,7 +74,6 @@ export const getAllPayments = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// Get payments by date range (admin only)
 export const getPaymentsByDateRange = async (req: Request<{}, {}, {}, { startDate: string; endDate: string }>, res: Response): Promise<void> => {
   try {
     const { startDate, endDate } = req.query;
@@ -115,7 +111,6 @@ export const getPaymentsByDateRange = async (req: Request<{}, {}, {}, { startDat
       ]
     }) as PopulatedPayment[];
 
-    // Calculate statistics for the date range
     const stats: PaymentStats = {
       total: payments.length,
       totalAmount: 0,

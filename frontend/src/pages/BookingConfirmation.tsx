@@ -74,19 +74,82 @@ const BookingConfirmation = () => {
 
   const handleDownloadTicket = async () => {
     try {
-      // Here you would typically generate and download a PDF ticket
+      const ticketWindow = window.open('', '_blank');
+      if (!ticketWindow) {
+        throw new Error('Failed to open ticket window');
+      }
+
+      const ticketHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Movie Ticket - ${bookingData.movie.title}</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            .ticket { border: 2px solid #000; padding: 20px; max-width: 600px; margin: 0 auto; }
+            .header { text-align: center; margin-bottom: 20px; }
+            .details { margin-bottom: 20px; }
+            .details p { margin: 5px 0; }
+            .qr-code { text-align: center; margin-top: 20px; }
+            .footer { text-align: center; margin-top: 20px; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="ticket">
+            <div class="header">
+              <h1>Movie Ticket</h1>
+              <h2>${bookingData.movie.title}</h2>
+            </div>
+            <div class="details">
+              <p><strong>Date:</strong> ${new Date(bookingData.showtime.startTime).toLocaleDateString()}</p>
+              <p><strong>Time:</strong> ${new Date(bookingData.showtime.startTime).toLocaleTimeString()}</p>
+              <p><strong>Theater:</strong> ${bookingData.showtime.theater}</p>
+              <p><strong>Location:</strong> ${bookingData.showtime.location}</p>
+              <p><strong>Seats:</strong> ${bookingData.seats.join(', ')}</p>
+              <p><strong>Booking ID:</strong> ${bookingData._id}</p>
+            </div>
+            <div class="qr-code">
+              <p>Scan this QR code at the theater</p>
+              <div id="qrcode"></div>
+            </div>
+            <div class="footer">
+              <p>Thank you for choosing CinePax!</p>
+              <p>Please arrive 15 minutes before the showtime.</p>
+            </div>
+          </div>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+          <script>
+            new QRCode(document.getElementById("qrcode"), {
+              text: "${bookingData._id}",
+              width: 128,
+              height: 128
+            });
+          </script>
+        </body>
+        </html>
+      `;
+
+      ticketWindow.document.write(ticketHTML);
+      ticketWindow.document.close();
+
+      setTimeout(() => {
+        ticketWindow.print();
+        ticketWindow.close();
+      }, 1000);
+
       toast({
         title: "Ticket Downloaded",
         description: "Your ticket has been downloaded successfully.",
-      })
+      });
     } catch (error) {
+      console.error("Error downloading ticket:", error);
       toast({
         title: "Download Failed",
         description: "Failed to download ticket. Please try again.",
         variant: "destructive"
-      })
+      });
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-background">

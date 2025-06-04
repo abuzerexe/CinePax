@@ -53,22 +53,31 @@ const Booking = () => {
   const [selectedSeats, setSelectedSeats] = useState<string[]>([])
   const [ticketCount, setTicketCount] = useState(1)
   const [paymentMethod, setPaymentMethod] = useState("card")
-  const [bookedSeats,] = useState<string[]>([])
+  const [bookedSeats, setBookedSeats] = useState<Array<{ id: string; name: string }>>([])
 
   useEffect(() => {
     const fetchBookingData = async () => {
       try {
         setLoading(true)
-        // Fetch showtime details
         const showtimeResponse = await theaters.getShowtime(showtimeId!)
         setShowtime(showtimeResponse.data)
         
-        // Fetch movie details
         const movieResponse = await movies.getById(showtimeResponse.data.movieId._id)
         setMovie(movieResponse.data)
+
+        const seatsResponse = await tickets.getBookedSeats(showtimeId!)
+        const bookedSeats = Array.isArray(seatsResponse.data.bookedSeats) 
+          ? seatsResponse.data.bookedSeats 
+          : []
+        setBookedSeats(bookedSeats)
       } catch (error) {
         console.error("Error fetching booking data:", error)
-        // navigate("/movies")
+        toast({
+          title: "Error",
+          description: "Failed to load booking information. Please try again.",
+          variant: "destructive"
+        })
+        navigate("/movies")
       } finally {
         setLoading(false)
       }
@@ -98,9 +107,8 @@ const Booking = () => {
   const validateBooking = async () => {
     if (!showtime) return false;
     
-    // Check if seats are available
     const unavailableSeats = selectedSeats.filter(seat => 
-      bookedSeats.includes(seat)
+      bookedSeats.some(bookedSeat => bookedSeat.id === seat)
     );
     
     if (unavailableSeats.length > 0) {
@@ -128,7 +136,6 @@ const Booking = () => {
     try {
       setProcessing(true);
 
-      // Validate booking
       if (!await validateBooking()) {
         return;
       }
@@ -137,14 +144,12 @@ const Booking = () => {
         throw new Error("Showtime or movie information is missing");
       }
 
-      // Create booking (this will also create the payment)
       const bookingResponse = await tickets.create({
         showtimeId: showtime._id,
         seats: selectedSeats,
         totalAmount: showtime.price * ticketCount
       });
 
-      // Navigate to confirmation with complete data
       navigate("/booking-confirmation", {
         state: {
           bookingData: {
@@ -178,7 +183,7 @@ const Booking = () => {
   };
 
   const generateSeatGrid = () => {
-    const rows = ["A", "B", "C", "D", "E", "F"]
+    const rows = ["A", "B", "C", "D", "E", "F", "G", "H"]
     const seatsPerRow = 10
     const seats = []
 
@@ -186,7 +191,7 @@ const Booking = () => {
       for (let i = 1; i <= seatsPerRow; i++) {
         const seatNumber = `${row}${i}`
         const isSelected = selectedSeats.includes(seatNumber)
-        const isOccupied = Math.random() < 0.3 // 30% chance of being occupied
+        const isOccupied = bookedSeats.some(seat => seat.id === seatNumber)
 
         seats.push(
           <button
@@ -205,7 +210,7 @@ const Booking = () => {
             `}
           >
             {seatNumber}
-          </button>,
+          </button>
         )
       }
     }
@@ -246,7 +251,7 @@ const Booking = () => {
               <CardContent>
                 <div className="flex gap-4">
                   <img
-                    src={movie.image || "/placeholder.svg"}
+                    src={movie.image || "https://placehold.co/600x900/e2e8f0/cbd5e1?text=Movie"}
                     alt={movie.title}
                     className="w-24 h-36 object-cover rounded"
                   />
@@ -326,7 +331,6 @@ const Booking = () => {
                     onChange={(e) => {
                       const count = Math.max(1, Number.parseInt(e.target.value) || 1)
                       setTicketCount(count)
-                      // Reset seat selection if count changes
                       setSelectedSeats([])
                     }}
                   />

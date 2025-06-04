@@ -50,16 +50,13 @@ const seatSchema = new Schema<ISeat>({
   timestamps: true
 });
 
-// Add compound index for showtime and seat
 seatSchema.index({ showtimeId: 1, seatNumber: 1, row: 1 }, { unique: true });
 
-// Add versioning middleware for optimistic locking
 seatSchema.pre('save', function(next) {
   this.version += 1;
   next();
 });
 
-// Static method for pessimistic locking
 seatSchema.statics.acquireLock = async function(
   showtimeId: mongoose.Types.ObjectId,
   seatNumber: string,
@@ -70,7 +67,6 @@ seatSchema.statics.acquireLock = async function(
   const now = new Date();
   const lockExpiresAt = new Date(now.getTime() + lockDuration);
 
-  // Try to acquire lock
   const seat = await this.findOneAndUpdate(
     {
       showtimeId,
@@ -93,7 +89,6 @@ seatSchema.statics.acquireLock = async function(
   return seat;
 };
 
-// Static method for releasing lock
 seatSchema.statics.releaseLock = async function(
   showtimeId: mongoose.Types.ObjectId,
   seatNumber: string,
@@ -117,7 +112,6 @@ seatSchema.statics.releaseLock = async function(
   );
 };
 
-// Static method for optimistic locking
 seatSchema.statics.updateWithVersion = async function(
   id: mongoose.Types.ObjectId,
   update: any,

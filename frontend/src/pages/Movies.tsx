@@ -22,18 +22,47 @@ interface Movie {
   releaseDate: string
 }
 
+interface PaginatedResponse {
+  success: boolean
+  count: number
+  total: number
+  totalPages: number
+  currentPage: number
+  data: Movie[]
+}
+
+const useDebounce = <T,>(value: T, delay: number): T => {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedValue(value)
+    }, delay)
+
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [value, delay])
+
+  return debouncedValue
+}
+
 const Movies = () => {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
+  const debouncedSearchQuery = useDebounce(searchQuery, 300) 
   const [moviesList, setMovies] = useState<Movie[]>([])
   const [filteredMovies, setFilteredMovies] = useState<Movie[]>([])
   const [selectedGenre, setSelectedGenre] = useState<string>("all")
   const [selectedYear, setSelectedYear] = useState<string>("all")
   const [sortBy, setSortBy] = useState<string>("title")
   const [showFilters, setShowFilters] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalMovies, setTotalMovies] = useState(0)
+  const itemsPerPage = 16
   const navigate = useNavigate()
 
-  // Get unique genres and years for filters
   const genres = Array.from(new Set(moviesList.map((movie) => movie.genre))).sort()
   const years = Array.from(new Set(moviesList.map((movie) => movie.year))).sort((a, b) => b - a)
 
@@ -41,10 +70,19 @@ const Movies = () => {
     const fetchMovies = async () => {
       setLoading(true)
       try {
-        const response = await movies.getAll()
-        const moviesData = response.data || []
-        setMovies(moviesData)
-        setFilteredMovies(moviesData)
+        const response = await movies.getAll({
+          page: currentPage,
+          limit: itemsPerPage,
+          search: debouncedSearchQuery, 
+          genre: selectedGenre,
+          year: selectedYear,
+          sortBy: sortBy
+        })
+        const paginatedData = response as PaginatedResponse
+        setMovies(paginatedData.data)
+        setFilteredMovies(paginatedData.data)
+        setTotalPages(paginatedData.totalPages)
+        setTotalMovies(paginatedData.total)
       } catch (error) {
         console.error("Error fetching movies:", error)
         setMovies([])
@@ -55,46 +93,17 @@ const Movies = () => {
     }
 
     fetchMovies()
-  }, [])
-
-  useEffect(() => {
-    const filtered = moviesList.filter((movie) => {
-      const matchesSearch = movie.title.toLowerCase().includes(searchQuery.toLowerCase())
-      const matchesGenre = selectedGenre === "all" || movie.genre === selectedGenre
-      const matchesYear = selectedYear === "all" || movie.year.toString() === selectedYear
-
-      return matchesSearch && matchesGenre && matchesYear
-    })
-
-    // Sort movies
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case "title":
-          return a.title.localeCompare(b.title)
-        case "year":
-          return b.year - a.year
-        case "rating":
-          return b.rating - a.rating
-        default:
-          return 0
-      }
-    })
-
-    setFilteredMovies(filtered)
-  }, [moviesList, searchQuery, selectedGenre, selectedYear, sortBy])
+  }, [currentPage, debouncedSearchQuery, selectedGenre, selectedYear, sortBy])
 
   const clearFilters = () => {
     setSearchQuery("")
     setSelectedGenre("all")
     setSelectedYear("all")
     setSortBy("title")
+    setCurrentPage(1)
   }
 
-  const hasActiveFilters = searchQuery || selectedGenre !== "all" || selectedYear !== "all" || sortBy !== "title"
-
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    e.currentTarget.src = "/placeholder.svg"
-  }
+ 
 
   if (loading) {
     return (
@@ -107,14 +116,13 @@ const Movies = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Movies</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
             Discover and book tickets for the latest movies showing in our theaters
           </p>
 
-          {/* Search and Filter */}
+          {/* Search & Filters */}
           <div className="max-w-4xl mx-auto space-y-4">
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="relative flex-1">
@@ -132,22 +140,17 @@ const Movies = () => {
               </Button>
             </div>
 
-            {/* Filter Panel */}
             {showFilters && (
               <Card className="p-4">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Genre</label>
                     <Select value={selectedGenre} onValueChange={setSelectedGenre}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Genres</SelectItem>
                         {genres.map((genre) => (
-                          <SelectItem key={genre} value={genre}>
-                            {genre}
-                          </SelectItem>
+                          <SelectItem key={genre} value={genre}>{genre}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -156,15 +159,11 @@ const Movies = () => {
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Year</label>
                     <Select value={selectedYear} onValueChange={setSelectedYear}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Years</SelectItem>
                         {years.map((year) => (
-                          <SelectItem key={year} value={year.toString()}>
-                            {year}
-                          </SelectItem>
+                          <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -173,9 +172,7 @@ const Movies = () => {
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Sort By</label>
                     <Select value={sortBy} onValueChange={setSortBy}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="title">Title</SelectItem>
                         <SelectItem value="year">Year</SelectItem>
@@ -185,7 +182,7 @@ const Movies = () => {
                   </div>
 
                   <div className="flex items-end">
-                    {hasActiveFilters && (
+                    {(searchQuery || selectedGenre !== "all" || selectedYear !== "all" || sortBy !== "title") && (
                       <Button variant="outline" onClick={clearFilters} className="w-full">
                         <X className="mr-2 h-4 w-4" />
                         Clear
@@ -195,57 +192,21 @@ const Movies = () => {
                 </div>
               </Card>
             )}
-
-            {/* Active Filters Display */}
-            {hasActiveFilters && (
-              <div className="flex flex-wrap gap-2">
-                {searchQuery && (
-                  <Badge variant="secondary">
-                    Search: {searchQuery}
-                    <X className="ml-1 h-3 w-3 cursor-pointer" onClick={() => setSearchQuery("")} />
-                  </Badge>
-                )}
-                {selectedGenre !== "all" && (
-                  <Badge variant="secondary">
-                    Genre: {selectedGenre}
-                    <X className="ml-1 h-3 w-3 cursor-pointer" onClick={() => setSelectedGenre("all")} />
-                  </Badge>
-                )}
-                {selectedYear !== "all" && (
-                  <Badge variant="secondary">
-                    Year: {selectedYear}
-                    <X className="ml-1 h-3 w-3 cursor-pointer" onClick={() => setSelectedYear("all")} />
-                  </Badge>
-                )}
-                {sortBy !== "title" && (
-                  <Badge variant="secondary">
-                    Sort: {sortBy.charAt(0).toUpperCase() + sortBy.slice(1)}
-                    <X className="ml-1 h-3 w-3 cursor-pointer" onClick={() => setSortBy("title")} />
-                  </Badge>
-                )}
-              </div>
-            )}
           </div>
         </div>
 
-        {/* Results Count */}
         <div className="mb-6">
           <p className="text-muted-foreground">
-            Showing {filteredMovies.length} of {moviesList.length} movies
+            Showing {filteredMovies.length} of {totalMovies} movies
           </p>
         </div>
 
         {/* Movies Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredMovies.map((movie) => (
             <Card key={movie._id} className="overflow-hidden hover:shadow-xl transition-shadow duration-300">
               <div className="relative">
-                <img
-                  src={movie.image}
-                  alt={movie.title}
-                  className="w-full h-64 object-cover"
-                  onError={handleImageError}
-                />
+                <img src={movie.image} alt={movie.title} className="w-full h-64 object-cover" />
                 <div className="absolute top-4 right-4">
                   <Badge variant="secondary" className="bg-black/70 text-white">
                     <Star className="w-3 h-3 mr-1 fill-yellow-400 text-yellow-400" />
@@ -257,26 +218,41 @@ const Movies = () => {
               <CardContent className="p-4">
                 <h3 className="text-lg font-semibold mb-2">{movie.title}</h3>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
-                  <span className="flex items-center">
-                    <Calendar className="w-4 h-4 mr-1" />
-                    {movie.year}
-                  </span>
-                  <span className="flex items-center">
-                    <Clock className="w-4 h-4 mr-1" />
-                    {movie.duration}
-                  </span>
+                  <span className="flex items-center"><Calendar className="w-4 h-4 mr-1" />{movie.year}</span>
+                  <span className="flex items-center"><Clock className="w-4 h-4 mr-1" />{movie.duration}</span>
                 </div>
                 <p className="text-sm text-muted-foreground line-clamp-2">{movie.description}</p>
               </CardContent>
 
               <CardFooter className="p-4 pt-0">
-                <Button className="w-full" onClick={() => navigate(`/movies/${movie._id}`)}>
-                  Book Tickets
-                </Button>
+                <Button className="w-full" onClick={() => navigate(`/movies/${movie._id}`)}>Book Tickets</Button>
               </CardFooter>
             </Card>
           ))}
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-10 gap-4 items-center">
+            <Button
+              variant="outline"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((prev) => prev - 1)}
+            >
+              Previous
+            </Button>
+            <span className="text-sm">
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((prev) => prev + 1)}
+            >
+              Next
+            </Button>
+          </div>
+        )}
 
         {filteredMovies.length === 0 && (
           <div className="text-center py-12">

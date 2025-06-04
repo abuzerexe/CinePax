@@ -32,7 +32,6 @@ const customerSchema = new Schema<ICustomer>({
   timestamps: true,
 });
 
-// Hash password before saving
 customerSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
   
@@ -45,12 +44,10 @@ customerSchema.pre('save', async function(next) {
   }
 });
 
-// Method to check password
 customerSchema.methods.isPasswordCorrect = async function(password: string): Promise<boolean> {
   return bcrypt.compare(password, this.password);
 };
 
-// Check if model exists before creating a new one
 const Customer = mongoose.models.Customer || mongoose.model<ICustomer>('Customer', customerSchema);
 
 export default Customer; 

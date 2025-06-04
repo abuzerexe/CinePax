@@ -15,12 +15,10 @@ const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps)
   const location = useLocation()
 
   if (!user) {
-    // Redirect to login if not authenticated
     return <Navigate to="/login" state={{ from: location }} replace />
   }
 
   if (requireAdmin && !isAdmin()) {
-    // Redirect to home if not admin
     return <Navigate to="/" replace />
   }
 
