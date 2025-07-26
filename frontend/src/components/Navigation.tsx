@@ -45,18 +45,18 @@ export default function Navigation() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center space-x-2">
-            <Film className="h-6 w-6 text-purple-600" />
-            <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              CinePax
-            </span>
-          </Link>
+          <Film className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+          <span className="text-xl font-bold bg-gradient-to-r from-purple-700 to-purple-800 dark:from-purple-500 dark:to-purple-300 bg-clip-text text-transparent">
+            CinePax
+          </span>
+            </Link>
 
-          <nav className="hidden md:flex items-center space-x-6">
+          <nav className="hidden md:flex items-center space-x-6 pl-20">
             {navItems.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
-                className="flex items-center space-x-1 text-sm font-medium transition-colors hover:text-purple-600"
+                className="flex items-center space-x-1 text-sm font-medium transition-colors hover:text-purple-800 dark:hover:text-purple-600"
               >
                 <item.icon className="h-4 w-4" />
                 <span>{item.name}</span>

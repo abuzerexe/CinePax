@@ -65,14 +65,21 @@ const Home = () => {
               Your ultimate destination for movie tickets and entertainment. Experience cinema like never before.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                size="lg"
-                onClick={() => navigate("/movies")}
-                className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 text-lg"
-              >
+            <Button
+              size="lg"
+              onClick={() => navigate("/movies")}
+              className="relative px-12 py-4 text-lg font-semibold text-white rounded-full bg-gradient-to-br from-purple-800 to-purple-950 hover:from-purple-900 hover:to-purple-950 transition-all duration-300 overflow-hidden shadow-[0_0_20px_rgba(128,0,255,0.4)]"
+            >
+              <span className="absolute inset-0 bg-white/10 group-hover:bg-white/20 transition duration-300 rounded-full pointer-events-none" />
+
+              <span className="absolute -inset-px rounded-full border border-purple-500/30 group-hover:border-purple-400/60 transition duration-300 animate-pulse pointer-events-none" />
+
+              <span className="relative z-10 flex items-center justify-center">
                 Browse Movies
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+                <ArrowRight className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1 duration-300" />
+              </span>
+            </Button>
+
               {/* <Button
                 size="lg"
                 variant="outline"
@@ -102,7 +109,7 @@ const Home = () => {
           </div>
 
           <div className="text-center">
-            <Button variant="outline" size="lg" onClick={() => navigate("/movies")} className="px-8 py-3 text-lg">
+            <Button variant="outline" size="lg" onClick={() => navigate("/movies")} className="px-8 py-3 text-lg border-purple-800 text-purple-800 hover:bg-purple-900 hover:text-white hover:border-purple-900 transition-colors duration-300 dark:text-white">
               View All Movies
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
@@ -110,7 +117,7 @@ const Home = () => {
         </div>
       </section>
 
-      <section className="py-16 bg-slate-50 dark:bg-slate-900">
+      {/* <section className="py-16 bg-slate-50 dark:bg-slate-900">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center">
@@ -134,7 +141,7 @@ const Home = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   )
 }

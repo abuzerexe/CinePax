@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
             <Link to="/" className="flex items-center space-x-2">
-              <Film className="h-6 w-6 text-purple-400" />
+              <Film className="h-6 w-6 text-purple-700" />
               <span className="text-xl font-bold">CinePax</span>
             </Link>
             <p className="text-slate-300 text-sm">
